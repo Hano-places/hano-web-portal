@@ -16,7 +16,7 @@ export function AppHeader() {
     <header className="flex h-[var(--shell-header-height)] shrink-0 items-center gap-4 border-b border-hano-border bg-white px-4 md:px-6">
       <Link
         href="/"
-        className="flex items-center gap-2 rounded-lg px-1 py-1 transition-colors hover:bg-hano-primary-50 md:hidden"
+        className="flex cursor-pointer items-center gap-2 rounded-lg px-1 py-1 transition-colors hover:bg-hano-primary-50 md:hidden"
       >
         <Image src={BRAND.logo} alt="Hano" width={24} height={24} />
         <span className="font-bold text-hano-green-500">Hano</span>
@@ -31,14 +31,14 @@ export function AppHeader() {
         <input
           type="search"
           placeholder="Search places, dishes..."
-          className="h-10 w-full max-w-xl rounded-full border border-hano-border bg-hano-surface pl-9 pr-4 text-sm text-hano-green-500 outline-none transition-colors placeholder:text-hano-muted hover:border-hano-green-300 focus:border-hano-green-500 focus:bg-white"
+          className="h-10 w-full max-w-xl cursor-text rounded-full border border-hano-border bg-hano-white-500 pl-9 pr-4 text-sm text-hano-green-500 outline-none transition-colors placeholder:text-hano-muted hover:border-hano-primary-400 hover:bg-hano-primary-50 focus:border-hano-green-500 focus:bg-white"
         />
       </div>
 
       <div className="flex items-center gap-2">
         <Link
           href="/cart"
-          className="relative flex h-10 w-10 items-center justify-center rounded-full border border-hano-border text-hano-green-500 transition-colors hover:border-hano-primary-500 hover:bg-hano-primary-50"
+          className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-hano-border text-hano-green-500 transition-colors hover:border-hano-primary-500 hover:bg-hano-primary-50"
           aria-label="Cart"
         >
           <Icon name="cart" size={18} />

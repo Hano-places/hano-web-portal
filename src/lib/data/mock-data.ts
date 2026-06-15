@@ -125,7 +125,7 @@ export const HOT_PROMOS: PromoItem[] = [
     title: "Get 10% Off with Christmas Sales",
     location: "Kigali Grill House Restaurant",
     points: 250,
-    image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400",
+    image: IMG.burgers,
   },
   {
     id: "2",

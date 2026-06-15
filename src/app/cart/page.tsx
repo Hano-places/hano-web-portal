@@ -33,7 +33,7 @@ export default function CartPage() {
       <h1 className="text-2xl font-bold">Cart ({getItemCount()})</h1>
       {items.map((item) => (
         <div key={item.id} className="flex gap-3 rounded-xl border p-3">
-          <Image src={item.image} alt="" width={64} height={64} className="rounded-lg object-cover" />
+          <Image src={item.image} alt="" width={64} height={64} className="h-16 w-16 shrink-0 rounded-lg object-cover" />
           <div className="flex-1">
             <p className="font-medium">{item.name}</p>
             <p className="text-sm text-hano-muted">{item.placeName}</p>

@@ -26,7 +26,7 @@ export function NotificationsRail() {
           <h2 className="mb-3 text-sm font-semibold text-hano-green-500">Hot Promos</h2>
           <div className="space-y-3">
             {PROMOS.map((promo) => (
-              <Card key={promo.id} className="overflow-hidden p-0 transition-shadow hover:shadow-md">
+              <Card key={promo.id} className="overflow-hidden p-0">
                 <div className="relative h-24">
                   <Image src={promo.image} alt="" fill className="object-cover" />
                 </div>

@@ -113,7 +113,7 @@ export default function PlaceDetailPage() {
         </div>
       </div>
 
-      <section className="rounded-[var(--radius-card)] border border-hano-border bg-white p-5 shadow-sm">
+      <section className="rounded-[var(--radius-card)] border border-hano-border bg-white p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-hano-green-500">Menu</h2>
@@ -146,7 +146,7 @@ export default function PlaceDetailPage() {
                 alt={item.name}
                 width={72}
                 height={72}
-                className="h-[72px] w-[72px] rounded-xl object-cover"
+                className="h-[72px] w-[72px] shrink-0 rounded-xl object-cover"
               />
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-hano-green-500">{item.name}</p>
@@ -182,7 +182,7 @@ export default function PlaceDetailPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <section>
           <h2 className="mb-3 font-semibold text-hano-green-500">Hours</h2>
-          <Card className="transition-shadow hover:shadow-md">
+          <Card>
             <ul className="space-y-2 text-sm">
               {weeklyHours.map(({ day, hours }) => (
                 <li key={day} className="flex justify-between">
@@ -199,7 +199,7 @@ export default function PlaceDetailPage() {
           <div className="space-y-3">
             {reviews.length > 0 ? (
               reviews.slice(0, 2).map((review, i) => (
-                <Card key={`${review.author}-${i}`} className="transition-shadow hover:shadow-md">
+                <Card key={`${review.author}-${i}`}>
                   <div className="flex items-center gap-2">
                     <div className="flex">
                       {Array.from({ length: 5 }).map((_, j) => (

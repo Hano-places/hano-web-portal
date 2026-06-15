@@ -32,7 +32,7 @@ export function UserSidebar({ isAuthenticated }: UserSidebarProps) {
       <div className="flex h-[var(--shell-header-height)] items-center border-b border-hano-border px-4">
         <Link
           href="/"
-          className="flex items-center gap-2 rounded-lg px-1 py-1 transition-colors hover:bg-hano-primary-50"
+          className="flex cursor-pointer items-center gap-2 rounded-lg px-1 py-1 transition-colors hover:bg-hano-primary-50"
         >
           <Image src={BRAND.logo} alt="Hano" width={28} height={28} />
           <span className="text-lg font-bold text-hano-green-500">Hano</span>
@@ -58,9 +58,9 @@ export function UserSidebar({ isAuthenticated }: UserSidebarProps) {
               key={href}
               href={targetHref}
               className={cn(
-                "flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium transition-colors",
+                "flex cursor-pointer items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium transition-colors",
                 active
-                  ? "bg-hano-primary-500 text-hano-green-500 shadow-sm"
+                  ? "bg-hano-primary-500 text-hano-green-500"
                   : "text-hano-green-400 hover:bg-hano-primary-50 hover:text-hano-green-500",
               )}
             >

@@ -14,10 +14,10 @@ export function PeriodPill({ label, active, onClick }: PeriodPillProps) {
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-full px-3 py-1.5 text-sm transition",
+        "cursor-pointer rounded-full border px-3 py-1.5 text-sm transition-colors",
         active
-          ? "border-2 border-hano-green-500 bg-hano-primary-100 font-medium text-hano-green-500"
-          : "border border-hano-border bg-white text-hano-muted hover:border-hano-green-300",
+          ? "border-transparent bg-hano-primary-500 font-medium text-hano-green-500"
+          : "border-hano-border bg-white text-hano-muted hover:border-hano-primary-400 hover:bg-hano-primary-50 hover:text-hano-green-500",
       )}
     >
       {label}

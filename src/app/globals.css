@@ -70,6 +70,11 @@
   --text-3xl: 2rem;
 
   --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-regular: 400;
+  --font-sans: var(--font-nunito);
+  --font-serif: var(--font-nunito);
+  --leading-tight: 1.12;
 
   --radius-sm: 8px;
   --radius-md: 16px;

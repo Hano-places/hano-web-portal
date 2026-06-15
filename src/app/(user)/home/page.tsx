@@ -58,7 +58,7 @@ export default function HomePage() {
               View all
             </Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {featured.map((place) => (
               <PlaceCard key={place.id} place={place} />
             ))}
@@ -70,7 +70,13 @@ export default function HomePage() {
         <div className="grid gap-4 sm:grid-cols-2">
           {TOP_DISHES.map((dish) => (
             <div key={dish.id} className="flex gap-3 rounded-xl border border-hano-border bg-white p-3">
-              <Image src={dish.image} alt="" width={72} height={72} className="rounded-lg object-cover" />
+              <Image
+                src={dish.image}
+                alt=""
+                width={72}
+                height={72}
+                className="h-[72px] w-[72px] shrink-0 rounded-lg object-cover"
+              />
               <div>
                 <p className="font-medium">{dish.name}</p>
                 <p className="text-xs text-hano-muted">{dish.location}</p>
@@ -84,8 +90,8 @@ export default function HomePage() {
       {tab === "moments" && (
         <div className="grid grid-cols-3 gap-2">
           {MOMENTS_FEED.slice(0, 6).map((m) => (
-            <div key={m.id} className="relative overflow-hidden rounded-xl">
-              <Image src={m.image} alt="" width={120} height={120} className="aspect-square w-full object-cover" />
+            <div key={m.id} className="relative aspect-square overflow-hidden rounded-xl">
+              <Image src={m.image} alt="" fill className="object-cover" sizes="33vw" />
             </div>
           ))}
         </div>
@@ -96,7 +102,13 @@ export default function HomePage() {
         <div className="grid gap-3 sm:grid-cols-2">
           {HOT_PROMOS.map((p) => (
             <div key={p.id} className="flex gap-3 rounded-xl border border-hano-border bg-white p-3">
-              <Image src={p.image} alt="" width={64} height={64} className="rounded-lg object-cover" />
+              <Image
+                src={p.image}
+                alt=""
+                width={64}
+                height={64}
+                className="h-16 w-16 shrink-0 rounded-lg object-cover"
+              />
               <div>
                 <p className="text-sm font-medium">{p.title}</p>
                 <p className="text-xs text-hano-muted">{p.location}</p>

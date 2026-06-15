@@ -88,14 +88,9 @@ export default function ProfilePage() {
         <h2 className="mb-3 font-semibold">My Moments</h2>
         <div className="grid grid-cols-3 gap-2">
           {MOMENTS_FEED.slice(0, 6).map((m) => (
-            <Image
-              key={m.id}
-              src={m.image}
-              alt=""
-              width={120}
-              height={120}
-              className="aspect-square rounded-xl object-cover"
-            />
+            <div key={m.id} className="relative aspect-square overflow-hidden rounded-xl">
+              <Image src={m.image} alt="" fill className="object-cover" sizes="33vw" />
+            </div>
           ))}
         </div>
       </section>

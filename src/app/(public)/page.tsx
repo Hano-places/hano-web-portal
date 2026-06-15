@@ -73,7 +73,7 @@ export default function PublicHomePage() {
       </div>
 
       {tab === "places" && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((place) => (
             <PlaceCard key={place.id} place={place} />
           ))}
@@ -100,8 +100,8 @@ export default function PublicHomePage() {
       {tab === "moments" && (
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {MOMENTS_FEED.slice(0, 8).map((m) => (
-            <div key={m.id} className="overflow-hidden rounded-xl">
-              <Image src={m.image} alt="" width={200} height={200} className="aspect-square w-full object-cover" />
+            <div key={m.id} className="relative aspect-square overflow-hidden rounded-xl">
+              <Image src={m.image} alt="" fill className="object-cover" sizes="25vw" />
             </div>
           ))}
         </div>
@@ -112,7 +112,13 @@ export default function PublicHomePage() {
         <div className="grid gap-4 sm:grid-cols-2">
           {HOT_PROMOS.map((promo) => (
             <div key={promo.id} className="flex gap-4 rounded-xl border border-hano-border bg-white p-4">
-              <Image src={promo.image} alt="" width={80} height={80} className="rounded-lg object-cover" />
+              <Image
+                src={promo.image}
+                alt=""
+                width={80}
+                height={80}
+                className="h-20 w-20 shrink-0 rounded-lg object-cover"
+              />
               <div>
                 <p className="font-medium">{promo.title}</p>
                 <p className="text-sm text-hano-muted">{promo.location}</p>

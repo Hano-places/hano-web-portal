@@ -22,7 +22,7 @@ function OrdersList() {
           className="flex gap-4 rounded-xl border border-hano-border p-4 transition hover:shadow-sm"
         >
           {order.placeImage && (
-            <Image src={order.placeImage} alt="" width={64} height={64} className="rounded-lg object-cover" />
+            <Image src={order.placeImage} alt="" width={64} height={64} className="h-16 w-16 shrink-0 rounded-lg object-cover" />
           )}
           <div className="flex-1">
             <p className="font-medium">{order.placeName}</p>

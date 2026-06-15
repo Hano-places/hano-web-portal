@@ -82,7 +82,7 @@ export default function PlaceMenuPage() {
         {items.map((item) => (
           <article
             key={item.id}
-            className="group flex gap-4 rounded-[var(--radius-card)] border border-hano-border bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-hano-primary-500 hover:shadow-md"
+            className="group flex gap-4 rounded-[var(--radius-card)] border border-hano-border bg-white p-4 transition-colors hover:border-hano-primary-400 hover:bg-hano-primary-50/40"
           >
             <Link href={`/places/${id}/menu/${item.id}`} className="shrink-0">
               <Image

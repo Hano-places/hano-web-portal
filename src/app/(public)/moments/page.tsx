@@ -38,7 +38,7 @@ export default function MomentsPage() {
               alt=""
               width={300}
               height={300}
-              className="w-full object-cover"
+              className="h-auto w-full object-cover"
             />
             <div className="p-3">
               <p className="text-sm font-medium">{moment.place}</p>
