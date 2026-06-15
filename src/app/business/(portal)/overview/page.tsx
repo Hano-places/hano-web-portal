@@ -8,12 +8,17 @@ import {
   RevenueTrendChart,
   SatisfactionChart,
 } from "@/components/business/charts";
-import { RecentOrdersPanel } from "@/components/places/place-card";
+import { BusinessQuickActions, RecentOrdersList } from "@/components/business/recent-orders";
+import { DailyGoalCard, NotificationsRail } from "@/components/layout/notifications-rail";
 import { Button } from "@/components/ui/button";
+import { PeriodPill } from "@/components/ui/period-pill";
 import type { BusinessDashboardData } from "@/lib/business/api-adapter";
+
+const PERIODS = ["Custom", "Today", "7d", "30d", "1M", "6M", "1Y"];
 
 export default function BusinessOverviewPage() {
   const [data, setData] = useState<BusinessDashboardData | null>(null);
+  const [period, setPeriod] = useState("30d");
 
   useEffect(() => {
     businessApi.getDashboard().then(setData);
@@ -24,49 +29,46 @@ export default function BusinessOverviewPage() {
   }
 
   return (
-    <div>
-      <div className="mb-6 flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Restaurant Overview</h1>
-          <p className="text-sm text-hano-muted">
-            Track revenue, orders, and customer satisfaction
-          </p>
-        </div>
-        <Button size="sm">Today&apos;s Status</Button>
-      </div>
-
-      <div className="mb-4 flex gap-2">
-        {["Custom", "Today", "7d", "30d", "1M", "6M", "1Y"].map((period, i) => (
-          <button
-            key={period}
-            type="button"
-            className={`rounded-lg px-3 py-1.5 text-sm ${
-              i === 3 ? "border-2 border-hano-green-500 font-medium" : "border border-hano-border"
-            }`}
-          >
-            {period}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-        <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-3">
-            {data.kpis.map((kpi) => (
-              <KpiCard key={kpi.label} kpi={kpi} />
-            ))}
+    <div className="flex gap-6">
+      <div className="min-w-0 flex-1 space-y-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Restaurant Overview</h1>
+            <p className="text-sm text-hano-muted">
+              Track revenue, orders, and customer satisfaction
+            </p>
           </div>
-
-          <RevenueTrendChart data={data.revenueChart} />
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <SatisfactionChart data={data.satisfactionChart} />
-            <OrdersCategoryChart data={data.ordersByCategory} />
-          </div>
+          <Button size="sm">Today&apos;s Status</Button>
         </div>
 
-        <RecentOrdersPanel orders={data.recentOrders} />
+        <div className="flex flex-wrap gap-2">
+          {PERIODS.map((p) => (
+            <PeriodPill key={p} label={p} active={period === p} onClick={() => setPeriod(p)} />
+          ))}
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          {data.kpis.map((kpi) => (
+            <KpiCard key={kpi.label} kpi={kpi} />
+          ))}
+        </div>
+
+        <RevenueTrendChart data={data.revenueChart} />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SatisfactionChart data={data.satisfactionChart} />
+          <OrdersCategoryChart data={data.ordersByCategory} />
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <DailyGoalCard />
+          <RecentOrdersList orders={data.recentOrders} />
+        </div>
+
+        <BusinessQuickActions />
       </div>
+
+      <NotificationsRail />
     </div>
   );
 }

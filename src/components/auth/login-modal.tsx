@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuthGate } from "@/hooks/use-require-auth";
 import Link from "next/link";
-import { X } from "lucide-react";
+import { useAuthGate } from "@/hooks/use-require-auth";
+import { Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 
 export function LoginModal() {
@@ -20,8 +20,9 @@ export function LoginModal() {
           type="button"
           onClick={closeLoginModal}
           className="absolute right-4 top-4 rounded-lg p-1 hover:bg-hano-surface"
+          aria-label="Close"
         >
-          <X className="h-5 w-5" />
+          <Icon name="close" size={20} />
         </button>
         <h2 className="text-xl font-bold text-hano-green-500">Sign in to continue</h2>
         <p className="mt-2 text-sm text-hano-muted">
@@ -29,10 +30,10 @@ export function LoginModal() {
         </p>
         <div className="mt-6 flex flex-col gap-3">
           <Link href={loginHref} onClick={closeLoginModal}>
-            <Button className="w-full">Log in</Button>
+            <Button fullWidth>Log in</Button>
           </Link>
           <Link href={registerHref} onClick={closeLoginModal}>
-            <Button variant="secondary" className="w-full">
+            <Button variant="secondary" fullWidth>
               Create account
             </Button>
           </Link>

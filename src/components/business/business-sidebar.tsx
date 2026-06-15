@@ -2,34 +2,24 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Settings,
-  Headphones,
-  Building2,
-  TrendingUp,
-  Wallet,
-  Megaphone,
-  ClipboardList,
-  LogOut,
-  ChevronLeft,
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth";
 import { useBusinessStore } from "@/store/business";
+import type { IconName } from "@/lib/icons";
 
-const navItems = [
-  { href: "/business/overview", label: "Overview", icon: LayoutDashboard },
-  { href: "/business/operations", label: "Operations", icon: ClipboardList, badge: 12 },
-  { href: "/business/finance", label: "Finance", icon: Wallet },
-  { href: "/business/insights", label: "Insights", icon: TrendingUp },
-  { href: "/business/marketing", label: "Marketing", icon: Megaphone },
+const navItems: { href: string; label: string; icon: IconName; badge?: number }[] = [
+  { href: "/business/overview", label: "Overview", icon: "dashboard" },
+  { href: "/business/operations", label: "Operations", icon: "clipboard", badge: 12 },
+  { href: "/business/finance", label: "Finance", icon: "finance" },
+  { href: "/business/insights", label: "Insights", icon: "insights" },
+  { href: "/business/marketing", label: "Marketing", icon: "marketing" },
 ];
 
-const configItems = [
-  { href: "/business/profile", label: "Business Profile", icon: Building2 },
-  { href: "/business/settings", label: "Settings", icon: Settings },
-  { href: "/business/support", label: "Support", icon: Headphones },
+const configItems: { href: string; label: string; icon: IconName }[] = [
+  { href: "/business/profile", label: "Business Profile", icon: "building" },
+  { href: "/business/settings", label: "Settings", icon: "settings" },
+  { href: "/business/support", label: "Support", icon: "headphones" },
 ];
 
 export function BusinessSidebar() {
@@ -51,7 +41,7 @@ export function BusinessSidebar() {
           Management
         </p>
         <nav className="space-y-1">
-          {navItems.map(({ href, label, icon: Icon, badge }) => {
+          {navItems.map(({ href, label, icon, badge }) => {
             const active = pathname === href;
             return (
               <Link
@@ -64,7 +54,7 @@ export function BusinessSidebar() {
                     : "text-hano-green-400 hover:bg-hano-surface",
                 )}
               >
-                <Icon className="h-4 w-4" />
+                <Icon name={icon} size={16} />
                 {label}
                 {badge && (
                   <span className="ml-auto rounded-full bg-hano-primary-500 px-2 py-0.5 text-xs font-bold">
@@ -80,7 +70,7 @@ export function BusinessSidebar() {
           Configurations
         </p>
         <nav className="space-y-1">
-          {configItems.map(({ href, label, icon: Icon }) => {
+          {configItems.map(({ href, label, icon }) => {
             const active = pathname === href;
             return (
               <Link
@@ -93,7 +83,7 @@ export function BusinessSidebar() {
                     : "text-hano-green-400 hover:bg-hano-surface",
                 )}
               >
-                <Icon className="h-4 w-4" />
+                <Icon name={icon} size={16} />
                 {label}
               </Link>
             );
@@ -106,7 +96,7 @@ export function BusinessSidebar() {
           href="/home"
           className="mb-3 flex items-center gap-2 text-sm text-hano-muted hover:text-hano-green-500"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <Icon name="chevronLeft" size={16} />
           User Portal
         </Link>
         <div className="flex items-center gap-3">
@@ -123,8 +113,9 @@ export function BusinessSidebar() {
             type="button"
             onClick={() => logout()}
             className="rounded-lg p-1.5 hover:bg-hano-surface"
+            aria-label="Log out"
           >
-            <LogOut className="h-4 w-4" />
+            <Icon name="logout" size={16} />
           </button>
         </div>
       </div>
@@ -135,20 +126,25 @@ export function BusinessSidebar() {
 export function BusinessHeader() {
   return (
     <header className="flex h-16 items-center gap-4 border-b border-hano-border bg-white px-6">
-      <div className="flex-1">
+      <div className="relative flex-1">
+        <Icon
+          name="search"
+          size={16}
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-hano-muted"
+        />
         <input
           type="search"
           placeholder="Search here..."
-          className="h-10 w-full max-w-xl rounded-xl border border-hano-border bg-hano-surface px-4 text-sm outline-none focus:border-hano-green-500"
+          className="h-10 w-full max-w-xl rounded-full border border-hano-border bg-hano-surface pl-9 pr-4 text-sm outline-none focus:border-hano-green-500"
         />
       </div>
-      <button type="button" className="relative rounded-xl border border-hano-border px-4 py-2 text-sm">
+      <button type="button" className="relative rounded-full border border-hano-border px-4 py-2 text-sm">
         Orders & Reservations
         <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-hano-primary-500 text-xs font-bold">
           12
         </span>
       </button>
-      <button type="button" className="relative rounded-xl border border-hano-border px-4 py-2 text-sm">
+      <button type="button" className="relative rounded-full border border-hano-border px-4 py-2 text-sm">
         Notifications
         <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-hano-primary-500 text-xs font-bold">
           12

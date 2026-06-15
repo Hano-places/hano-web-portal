@@ -7,7 +7,7 @@ import { PLACE_MENU_ITEMS } from "@/lib/data/mock-data";
 import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useCartStore } from "@/store/cart";
-import { Star } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 
 export default function ItemDetailPage() {
   const params = useParams();
@@ -49,7 +49,7 @@ export default function ItemDetailPage() {
       </div>
       <h1 className="mt-4 text-2xl font-bold">{item.name}</h1>
       <div className="mt-2 flex items-center gap-2">
-        <Star className="h-4 w-4 fill-hano-primary-500 text-hano-primary-500" />
+        <Icon name="star" size={16} className="text-hano-primary-500" />
         <span>{item.rating}</span>
         <span className="text-sm text-hano-muted">{item.orders} orders</span>
       </div>

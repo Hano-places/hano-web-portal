@@ -1,60 +1,65 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { placesApi } from "@/lib/api/places";
-import { photosApi } from "@/lib/api/photos";
+import { getFeaturedPlaces } from "@/lib/places-data";
 import { PlaceCard } from "@/components/places/place-card";
 import { HOT_PROMOS, TOP_DISHES } from "@/lib/data/mock-data";
-import { Input } from "@/components/ui/input";
+import { HOME_KPIS, MOMENTS_FEED } from "@/lib/data/feed-data";
+import { PeriodPill } from "@/components/ui/period-pill";
+import { Card } from "@/components/ui/card";
+import { FilterChip } from "@/components/ui/filter-chip";
+
+const PERIODS = ["Today", "7d", "30d", "1M"];
 
 export default function HomePage() {
+  const [period, setPeriod] = useState("Today");
   const [tab, setTab] = useState<"dishes" | "places" | "moments">("places");
-
-  const { data: places } = useQuery({
-    queryKey: ["places", "home"],
-    queryFn: () => placesApi.getPlaces({ limit: 6, sort: "rating", order: "desc" }),
-  });
-
-  const { data: photos } = useQuery({
-    queryKey: ["my-photos-home"],
-    queryFn: () => photosApi.getMyPhotos(6, 0),
-  });
+  const featured = getFeaturedPlaces();
 
   return (
     <div className="space-y-8">
       <div>
         <p className="text-sm text-hano-muted">📍 Kigali, Nyarutarama</p>
-        <Input placeholder="Search places, dishes..." className="mt-3" />
+        <h1 className="mt-1 text-2xl font-bold">Welcome back</h1>
+        <p className="text-sm text-hano-muted">
+          Featured places, top dishes, and moments from around Kigali
+        </p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
+        {PERIODS.map((p) => (
+          <PeriodPill key={p} label={p} active={period === p} onClick={() => setPeriod(p)} />
+        ))}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        {HOME_KPIS.map((kpi) => (
+          <Card key={kpi.label}>
+            <p className="text-sm text-hano-muted">{kpi.label}</p>
+            <p className="mt-1 text-2xl font-bold">{kpi.value}</p>
+            {kpi.change && <p className="mt-1 text-xs text-hano-muted">{kpi.change}</p>}
+          </Card>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
         {(["dishes", "places", "moments"] as const).map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            className={`rounded-full px-4 py-1.5 text-sm capitalize ${
-              tab === t ? "bg-hano-green-500 text-white" : "bg-hano-surface"
-            }`}
-          >
-            {t}
-          </button>
+          <FilterChip key={t} label={t} active={tab === t} onClick={() => setTab(t)} />
         ))}
       </div>
 
       {tab === "places" && (
         <section>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-semibold">Top Places</h2>
-            <Link href="/explore" className="text-sm text-hano-muted hover:underline">
+            <h2 className="font-semibold">Featured Places</h2>
+            <Link href="/places" className="text-sm text-hano-muted hover:underline">
               View all
             </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {places?.data.map((place) => (
+            {featured.map((place) => (
               <PlaceCard key={place.id} place={place} />
             ))}
           </div>
@@ -64,7 +69,7 @@ export default function HomePage() {
       {tab === "dishes" && (
         <div className="grid gap-4 sm:grid-cols-2">
           {TOP_DISHES.map((dish) => (
-            <div key={dish.id} className="flex gap-3 rounded-xl border border-hano-border p-3">
+            <div key={dish.id} className="flex gap-3 rounded-xl border border-hano-border bg-white p-3">
               <Image src={dish.image} alt="" width={72} height={72} className="rounded-lg object-cover" />
               <div>
                 <p className="font-medium">{dish.name}</p>
@@ -78,12 +83,11 @@ export default function HomePage() {
 
       {tab === "moments" && (
         <div className="grid grid-cols-3 gap-2">
-          {photos?.photos.map((p) => (
-            <Image key={p.id} src={p.url} alt="" width={120} height={120} className="rounded-xl object-cover" />
+          {MOMENTS_FEED.slice(0, 6).map((m) => (
+            <div key={m.id} className="relative overflow-hidden rounded-xl">
+              <Image src={m.image} alt="" width={120} height={120} className="aspect-square w-full object-cover" />
+            </div>
           ))}
-          {(!photos?.photos || photos.photos.length === 0) && (
-            <p className="col-span-3 text-sm text-hano-muted">No moments yet. Capture one!</p>
-          )}
         </div>
       )}
 
@@ -91,7 +95,7 @@ export default function HomePage() {
         <h2 className="mb-4 font-semibold">Hot Picks & Promos</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {HOT_PROMOS.map((p) => (
-            <div key={p.id} className="flex gap-3 rounded-xl border p-3">
+            <div key={p.id} className="flex gap-3 rounded-xl border border-hano-border bg-white p-3">
               <Image src={p.image} alt="" width={64} height={64} className="rounded-lg object-cover" />
               <div>
                 <p className="text-sm font-medium">{p.title}</p>

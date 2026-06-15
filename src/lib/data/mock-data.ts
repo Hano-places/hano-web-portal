@@ -1,3 +1,5 @@
+import { IMG } from "@/content/images";
+
 export type MenuItem = {
   id: string;
   name: string;
@@ -46,7 +48,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     priceRaw: 2000,
     orders: 312,
     rating: 4.9,
-    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400",
+    image: IMG.gourmetBurger,
     category: "Burgers",
   },
   {
@@ -57,7 +59,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     priceRaw: 2500,
     orders: 245,
     rating: 4.7,
-    image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400",
+    image: IMG.burgers,
     category: "Burgers",
   },
   {
@@ -68,7 +70,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     priceRaw: 2000,
     orders: 189,
     rating: 4.8,
-    image: "https://images.unsplash.com/photo-1606755962773-552769c4c8b4?w=400",
+    image: IMG.gourmetBurger,
     category: "Burgers",
   },
   {
@@ -79,7 +81,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     priceRaw: 4500,
     orders: 312,
     rating: 4.6,
-    image: "https://images.unsplash.com/photo-1529042410759-befb1204b916?w=400",
+    image: IMG.joyfulScene,
     category: "Grills",
   },
   {
@@ -90,7 +92,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     priceRaw: 1500,
     orders: 420,
     rating: 4.5,
-    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400",
+    image: IMG.creamyDrink,
     category: "Beverages",
   },
   {
@@ -101,7 +103,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     priceRaw: 6500,
     orders: 195,
     rating: 4.4,
-    image: "https://images.unsplash.com/photo-1519708227411-c8fd9a32b4a2?w=400",
+    image: IMG.elegantTable,
     category: "Seafood",
   },
 ];
@@ -113,7 +115,7 @@ export const TOP_DISHES: DishItem[] = PLACE_MENU_ITEMS.slice(0, 4).map((item) =>
   price: item.price,
   priceRaw: item.priceRaw,
   orders: item.orders,
-  location: "Kigali Grill House",
+  location: "Boho",
   image: item.image,
 }));
 
@@ -130,7 +132,7 @@ export const HOT_PROMOS: PromoItem[] = [
     title: "Free Coffee with Every Meal",
     location: "Bourbon Coffee Kacyiru",
     points: 150,
-    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400",
+    image: IMG.creamyDrink,
   },
 ];
 

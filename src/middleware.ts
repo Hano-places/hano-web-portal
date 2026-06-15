@@ -4,7 +4,9 @@ import type { NextRequest } from "next/server";
 const protectedPrefixes = [
   "/home",
   "/wallet",
+  "/activity",
   "/profile",
+  "/settings",
   "/orders",
   "/checkout",
   "/moments/capture",
@@ -18,15 +20,20 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get("@hano/accessToken")?.value;
 
+  if (pathname === "/location" || pathname.startsWith("/location/")) {
+    return NextResponse.redirect(new URL("/places", request.url));
+  }
+
+  if (pathname === "/wallet" || pathname.startsWith("/wallet/")) {
+    return NextResponse.redirect(new URL("/activity", request.url));
+  }
+
   const isProtected = protectedPrefixes.some(
     (p) => pathname === p || pathname.startsWith(`${p}/`),
   );
   const isAuthRoute = authRoutes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
-  // Client-side auth uses localStorage; middleware checks cookie if set
-  // For SSR protection, redirect unauthenticated users on protected routes when no cookie
   if (isProtected && !accessToken) {
-    // Allow client-side auth check — only block business routes strictly
     if (pathname.startsWith("/business")) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("returnTo", pathname);
@@ -45,6 +52,9 @@ export const config = {
   matcher: [
     "/home/:path*",
     "/wallet/:path*",
+    "/activity/:path*",
+    "/settings/:path*",
+    "/location/:path*",
     "/profile/:path*",
     "/orders/:path*",
     "/checkout/:path*",

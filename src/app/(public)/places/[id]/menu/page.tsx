@@ -1,13 +1,13 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { placesApi } from "@/lib/api/places";
+import { getPlaceById } from "@/lib/places-data";
 import { PLACE_MENU_ITEMS } from "@/lib/data/mock-data";
 import { Button } from "@/components/ui/button";
+import { FilterChip } from "@/components/ui/filter-chip";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useCartStore } from "@/store/cart";
 
@@ -17,11 +17,7 @@ export default function PlaceMenuPage() {
   const [category, setCategory] = useState("All");
   const requireAuth = useRequireAuth();
   const addItem = useCartStore((s) => s.addItem);
-
-  const { data: place } = useQuery({
-    queryKey: ["place", id],
-    queryFn: () => placesApi.getPlace(id),
-  });
+  const place = getPlaceById(id);
 
   const categories = ["All", ...new Set(PLACE_MENU_ITEMS.map((i) => i.category))];
   const items =
@@ -49,20 +45,14 @@ export default function PlaceMenuPage() {
       </Link>
       <h1 className="mt-4 text-2xl font-bold">Menu</h1>
 
-      <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
+      <div className="mt-4 flex flex-wrap gap-2">
         {categories.map((cat) => (
-          <button
+          <FilterChip
             key={cat}
-            type="button"
+            label={cat}
+            active={category === cat}
             onClick={() => setCategory(cat)}
-            className={`shrink-0 rounded-full px-4 py-1.5 text-sm ${
-              category === cat
-                ? "bg-hano-green-500 text-white"
-                : "bg-hano-surface"
-            }`}
-          >
-            {cat}
-          </button>
+          />
         ))}
       </div>
 
@@ -70,7 +60,7 @@ export default function PlaceMenuPage() {
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex gap-4 rounded-xl border border-hano-border p-4"
+            className="flex gap-4 rounded-xl border border-hano-border bg-white p-4"
           >
             <Image
               src={item.image}

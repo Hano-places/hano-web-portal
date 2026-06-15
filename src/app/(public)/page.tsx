@@ -1,20 +1,23 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { placesApi } from "@/lib/api/places";
+import { getFeaturedPlaces } from "@/lib/places-data";
 import { PlaceCard } from "@/components/places/place-card";
 import { HOT_PROMOS, ONBOARDING_SLIDES, TOP_DISHES } from "@/lib/data/mock-data";
+import { HOME_KPIS, MOMENTS_FEED } from "@/lib/data/feed-data";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import { PeriodPill } from "@/components/ui/period-pill";
+import { Card } from "@/components/ui/card";
+import { FilterChip } from "@/components/ui/filter-chip";
+
+const PERIODS = ["Today", "7d", "30d", "1M"];
 
 export default function PublicHomePage() {
+  const [period, setPeriod] = useState("Today");
   const [tab, setTab] = useState<"dishes" | "places" | "moments">("places");
-  const { data, isLoading } = useQuery({
-    queryKey: ["places", "featured"],
-    queryFn: () => placesApi.getPlaces({ limit: 8, sort: "rating", order: "desc" }),
-  });
+  const featured = getFeaturedPlaces();
 
   return (
     <div className="space-y-8">
@@ -27,7 +30,7 @@ export default function PublicHomePage() {
           you&apos;re ready to order or share moments.
         </p>
         <div className="mt-6 flex gap-3">
-          <Link href="/explore">
+          <Link href="/places">
             <Button>Explore places</Button>
           </Link>
           <Link href="/register">
@@ -36,11 +39,26 @@ export default function PublicHomePage() {
         </div>
       </section>
 
+      <div className="flex flex-wrap gap-2">
+        {PERIODS.map((p) => (
+          <PeriodPill key={p} label={p} active={period === p} onClick={() => setPeriod(p)} />
+        ))}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        {HOME_KPIS.map((kpi) => (
+          <Card key={kpi.label}>
+            <p className="text-sm text-hano-muted">{kpi.label}</p>
+            <p className="mt-1 text-2xl font-bold">{kpi.value}</p>
+          </Card>
+        ))}
+      </div>
+
       <section>
         <h2 className="mb-4 text-lg font-semibold">Why Hano?</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {ONBOARDING_SLIDES.map((slide) => (
-            <div key={slide.title} className="rounded-xl border border-hano-border p-4">
+            <div key={slide.title} className="rounded-xl border border-hano-border bg-white p-4">
               <h3 className="font-medium">{slide.title}</h3>
               <p className="mt-1 text-sm text-hano-muted">{slide.desc}</p>
             </div>
@@ -48,65 +66,52 @@ export default function PublicHomePage() {
         </div>
       </section>
 
-      <section>
-        <div className="mb-4 flex gap-2">
-          {(["dishes", "places", "moments"] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTab(t)}
-              className={`rounded-full px-4 py-1.5 text-sm capitalize ${
-                tab === t
-                  ? "bg-hano-green-500 text-white"
-                  : "bg-hano-surface text-hano-muted"
-              }`}
-            >
-              {t}
-            </button>
+      <div className="flex flex-wrap gap-2">
+        {(["dishes", "places", "moments"] as const).map((t) => (
+          <FilterChip key={t} label={t} active={tab === t} onClick={() => setTab(t)} />
+        ))}
+      </div>
+
+      {tab === "places" && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((place) => (
+            <PlaceCard key={place.id} place={place} />
           ))}
         </div>
+      )}
 
-        {tab === "places" && (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {isLoading && <p className="text-sm text-hano-muted">Loading places...</p>}
-            {data?.data.map((place) => (
-              <PlaceCard key={place.id} place={place} />
-            ))}
-          </div>
-        )}
-
-        {tab === "dishes" && (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {TOP_DISHES.map((dish) => (
-              <div key={dish.id} className="overflow-hidden rounded-xl border border-hano-border">
-                <div className="relative h-32">
-                  <Image src={dish.image} alt={dish.name} fill className="object-cover" />
-                </div>
-                <div className="p-3">
-                  <p className="font-medium">{dish.name}</p>
-                  <p className="text-xs text-hano-muted">{dish.location}</p>
-                  <p className="mt-1 text-sm font-semibold text-hano-green-500">{dish.price}</p>
-                </div>
+      {tab === "dishes" && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {TOP_DISHES.map((dish) => (
+            <div key={dish.id} className="overflow-hidden rounded-xl border border-hano-border bg-white">
+              <div className="relative h-32">
+                <Image src={dish.image} alt={dish.name} fill className="object-cover" />
               </div>
-            ))}
-          </div>
-        )}
+              <div className="p-3">
+                <p className="font-medium">{dish.name}</p>
+                <p className="text-xs text-hano-muted">{dish.location}</p>
+                <p className="mt-1 text-sm font-semibold text-hano-green-500">{dish.price}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
-        {tab === "moments" && (
-          <div className="text-center">
-            <p className="text-hano-muted">Browse the moments feed</p>
-            <Link href="/moments" className="mt-3 inline-block text-sm font-medium underline">
-              View all moments
-            </Link>
-          </div>
-        )}
-      </section>
+      {tab === "moments" && (
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+          {MOMENTS_FEED.slice(0, 8).map((m) => (
+            <div key={m.id} className="overflow-hidden rounded-xl">
+              <Image src={m.image} alt="" width={200} height={200} className="aspect-square w-full object-cover" />
+            </div>
+          ))}
+        </div>
+      )}
 
       <section>
         <h2 className="mb-4 text-lg font-semibold">Hot Picks & Promos</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {HOT_PROMOS.map((promo) => (
-            <div key={promo.id} className="flex gap-4 rounded-xl border border-hano-border p-4">
+            <div key={promo.id} className="flex gap-4 rounded-xl border border-hano-border bg-white p-4">
               <Image src={promo.image} alt="" width={80} height={80} className="rounded-lg object-cover" />
               <div>
                 <p className="font-medium">{promo.title}</p>

@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 import { useBusinessStore } from "@/store/business";
-import { Building2 } from "lucide-react";
 
 function CreateBusinessContent() {
   const router = useRouter();
@@ -19,7 +19,7 @@ function CreateBusinessContent() {
   return (
     <div className="mx-auto max-w-lg py-12">
       <Card className="text-center">
-        <Building2 className="mx-auto h-12 w-12 text-hano-green-500" />
+        <Icon name="building" size={48} className="mx-auto text-hano-green-500" />
         <h1 className="mt-4 text-2xl font-bold">Create a business account</h1>
         <p className="mt-2 text-sm text-hano-muted">
           Use the same Hano credentials to manage your restaurant, café, or lounge.
@@ -36,9 +36,7 @@ function CreateBusinessContent() {
 export default function CreateBusinessPage() {
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-hano-surface p-4">
-        <CreateBusinessContent />
-      </div>
+      <CreateBusinessContent />
     </AuthGuard>
   );
 }

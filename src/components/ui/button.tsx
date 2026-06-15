@@ -1,40 +1,50 @@
-import { cn } from "@/lib/utils";
-import { ButtonHTMLAttributes, forwardRef } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { forwardRef } from "react";
+import styles from "./button.module.css";
 
-type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
+type ButtonVariant = "solid" | "outline" | "secondary" | "ghost" | "danger" | "primary";
 type ButtonSize = "sm" | "md" | "lg";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
-}
-
-const variants: Record<ButtonVariant, string> = {
-  primary: "bg-hano-green-500 text-white hover:opacity-90",
-  secondary: "bg-hano-primary-500 text-hano-green-500 hover:bg-hano-primary-400",
-  outline: "border border-hano-border bg-white hover:bg-hano-surface",
-  ghost: "hover:bg-hano-surface",
-  danger: "bg-hano-danger-500 text-white hover:opacity-90",
+  fullWidth?: boolean;
+  children: ReactNode;
 };
 
-const sizes: Record<ButtonSize, string> = {
-  sm: "h-8 px-3 text-sm",
-  md: "h-10 px-4 text-sm",
-  lg: "h-12 px-6 text-base",
+const variantMap: Record<ButtonVariant, string> = {
+  solid: styles.solid,
+  primary: styles.solid,
+  outline: styles.outline,
+  secondary: styles.secondary,
+  ghost: styles.ghost,
+  danger: styles.danger,
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "primary", size = "md", ...props }, ref) => (
-    <button
-      ref={ref}
-      className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition disabled:opacity-50",
-        variants[variant],
-        sizes[size],
-        className,
-      )}
-      {...props}
-    />
-  ),
+  (
+    {
+      variant = "solid",
+      size = "md",
+      fullWidth = false,
+      className = "",
+      children,
+      type = "button",
+      ...props
+    },
+    ref,
+  ) => {
+    const sizeClass = size === "sm" ? styles.sm : size === "lg" ? styles.lg : "";
+    return (
+      <button
+        ref={ref}
+        type={type}
+        className={`${styles.button} ${variantMap[variant]} ${sizeClass} ${fullWidth ? styles.fullWidth : ""} ${className}`.trim()}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  },
 );
 Button.displayName = "Button";

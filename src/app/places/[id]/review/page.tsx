@@ -5,7 +5,7 @@ import { FormEvent, useState } from "react";
 import { reviewsApi } from "@/lib/api/reviews";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { Button } from "@/components/ui/button";
-import { Star } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 
 function ReviewForm() {
   const params = useParams();
@@ -33,8 +33,10 @@ function ReviewForm() {
         <div className="flex gap-1">
           {Array.from({ length: 5 }).map((_, i) => (
             <button key={i} type="button" onClick={() => setRating(i + 1)}>
-              <Star
-                className={`h-8 w-8 ${i < rating ? "fill-hano-primary-500 text-hano-primary-500" : "text-hano-border"}`}
+              <Icon
+                name="star"
+                size={32}
+                className={i < rating ? "text-hano-primary-500" : "text-hano-border"}
               />
             </button>
           ))}

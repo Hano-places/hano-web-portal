@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { TrendingDown, TrendingUp } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import type { BusinessKpi } from "@/lib/business/mock-data";
 
 export function KpiCard({ kpi }: { kpi: BusinessKpi }) {
@@ -13,11 +13,11 @@ export function KpiCard({ kpi }: { kpi: BusinessKpi }) {
       <p className="text-sm text-hano-muted">{kpi.label}</p>
       <p className="mt-1 text-2xl font-bold text-hano-green-500">{kpi.value}</p>
       <div className="mt-2 flex items-center gap-1">
-        {positive ? (
-          <TrendingUp className="h-4 w-4 text-hano-success" />
-        ) : (
-          <TrendingDown className="h-4 w-4 text-hano-danger-500" />
-        )}
+        <Icon
+          name={positive ? "trendingUp" : "trendingDown"}
+          size={16}
+          className={positive ? "text-hano-success" : "text-hano-danger-500"}
+        />
         <span
           className={cn(
             "text-sm font-medium",
