@@ -13,7 +13,7 @@ export function NotificationsRail() {
           <h2 className="mb-3 text-sm font-semibold text-hano-green-500">Notifications</h2>
           <ul className="space-y-3">
             {NOTIFICATIONS.map((n) => (
-              <li key={n.id} className="rounded-xl border border-hano-border p-3">
+              <li key={n.id} className="rounded-xl border border-hano-border p-3 transition-colors hover:border-hano-primary-500 hover:bg-hano-primary-50">
                 <p className="text-sm font-medium">{n.title}</p>
                 <p className="mt-1 text-xs text-hano-muted line-clamp-2">{n.body}</p>
                 <p className="mt-2 text-xs text-hano-muted">{n.timeAgo}</p>
@@ -26,7 +26,7 @@ export function NotificationsRail() {
           <h2 className="mb-3 text-sm font-semibold text-hano-green-500">Hot Promos</h2>
           <div className="space-y-3">
             {PROMOS.map((promo) => (
-              <Card key={promo.id} className="overflow-hidden p-0">
+              <Card key={promo.id} className="overflow-hidden p-0 transition-shadow hover:shadow-md">
                 <div className="relative h-24">
                   <Image src={promo.image} alt="" fill className="object-cover" />
                 </div>
@@ -40,7 +40,7 @@ export function NotificationsRail() {
               </Card>
             ))}
           </div>
-          <Link href="/places" className="mt-3 block text-center text-xs text-hano-muted hover:underline">
+          <Link href="/places" className="mt-3 block text-center text-xs text-hano-muted transition-colors hover:text-hano-green-500 hover:underline">
             View all promos
           </Link>
         </section>

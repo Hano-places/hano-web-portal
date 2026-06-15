@@ -30,6 +30,10 @@ function toCard(place: PlaceSeed): WebPlaceCard {
   };
 }
 
+export function getPlaceSeeds(): PlaceSeed[] {
+  return [...places];
+}
+
 export function getPlaces(): WebPlaceCard[] {
   return places.map(toCard);
 }
@@ -42,30 +46,38 @@ export function getFeaturedPlaces(): WebPlaceCard[] {
   return places.filter((p) => p.featured).map(toCard);
 }
 
-export function getPlacesByType(type: string): WebPlaceCard[] {
-  if (type === "all") return getPlaces();
+export function getFeaturedPlaceSeeds(): PlaceSeed[] {
+  return places.filter((p) => p.featured);
+}
+
+export function getPlaceSeedsByType(type: string): PlaceSeed[] {
+  if (type === "all") return getPlaceSeeds();
   const normalized = type.toLowerCase();
-  return places
-    .filter((p) => {
-      if (normalized === "restaurants") return p.type === "restaurant" || p.type === "fine-dining" || p.type === "bistro";
-      if (normalized === "cafés" || normalized === "cafes") return p.type === "cafe" || p.type === "bakery";
-      if (normalized === "lounges") return p.type === "lounge";
-      if (normalized === "bars") return p.type === "bar";
-      return p.type === normalized;
-    })
-    .map(toCard);
+  return places.filter((p) => {
+    if (normalized === "restaurants") return p.type === "restaurant" || p.type === "fine-dining" || p.type === "bistro";
+    if (normalized === "cafés" || normalized === "cafes") return p.type === "cafe" || p.type === "bakery";
+    if (normalized === "lounges") return p.type === "lounge";
+    if (normalized === "bars") return p.type === "bar";
+    return p.type === normalized;
+  });
+}
+
+export function getPlacesByType(type: string): WebPlaceCard[] {
+  return getPlaceSeedsByType(type).map(toCard);
+}
+
+export function searchPlaceSeeds(query: string): PlaceSeed[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return getPlaceSeeds();
+  return places.filter(
+    (p) =>
+      p.name.toLowerCase().includes(q) ||
+      p.location.toLowerCase().includes(q) ||
+      p.category.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q),
+  );
 }
 
 export function searchPlaces(query: string): WebPlaceCard[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return getPlaces();
-  return places
-    .filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.location.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q),
-    )
-    .map(toCard);
+  return searchPlaceSeeds(query).map(toCard);
 }

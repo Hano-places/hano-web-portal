@@ -1,36 +1,65 @@
 @import "tailwindcss";
 
 :root {
-  /* Hano brand palette */
-  --hano-primary-50: #faffef;
-  --hano-primary-100: #eeffce;
-  --hano-primary-200: #e6ffb7;
-  --hano-primary-300: #daff96;
-  --hano-primary-400: #d3ff81;
-  --hano-primary-500: #c8ff62;
-  --hano-primary-600: #b6e859;
-  --hano-primary-700: #8eb546;
-  --hano-green-500: #001814;
-  --hano-green-400: #334643;
-  --hano-green-300: #546462;
-  --hano-white-500: #fffaf3;
-  --hano-danger-500: #ff383c;
+  /* Foundation palette — docs/colors.css */
+  --foundation-primary-primary-50: #faffef;
+  --foundation-primary-primary-100: #eeffce;
+  --foundation-primary-primary-200: #e6ffb7;
+  --foundation-primary-primary-300: #daff96;
+  --foundation-primary-primary-400: #d3ff81;
+  --foundation-primary-primary-500: #c8ff62;
+  --foundation-primary-primary-600: #b6e859;
+  --foundation-primary-primary-700: #8eb546;
+  --foundation-primary-primary-800: #6e8c36;
+  --foundation-primary-primary-900: #546b29;
+  --foundation-green-green-50: #e6e8e8;
+  --foundation-green-green-100: #b0b7b6;
+  --foundation-green-green-200: #8a9593;
+  --foundation-green-green-300: #546462;
+  --foundation-green-green-400: #334643;
+  --foundation-green-green-500: #001814;
+  --foundation-green-green-600: #001612;
+  --foundation-green-green-700: #00110e;
+  --foundation-green-green-800: #000d0b;
+  --foundation-green-green-900: #000a08;
+  --foundation-white-white-500: #fffaf3;
+  --foundation-white-white-200: #fffdf9;
+  --foundation-danger-danger-500: #ff383c;
+
+  /* Hano aliases */
+  --hano-primary-50: var(--foundation-primary-primary-50);
+  --hano-primary-100: var(--foundation-primary-primary-100);
+  --hano-primary-200: var(--foundation-primary-primary-200);
+  --hano-primary-300: var(--foundation-primary-primary-300);
+  --hano-primary-400: var(--foundation-primary-primary-400);
+  --hano-primary-500: var(--foundation-primary-primary-500);
+  --hano-primary-600: var(--foundation-primary-primary-600);
+  --hano-primary-700: var(--foundation-primary-primary-700);
+  --hano-green-500: var(--foundation-green-green-500);
+  --hano-green-400: var(--foundation-green-green-400);
+  --hano-green-300: var(--foundation-green-green-300);
+  --hano-white-500: var(--foundation-white-white-500);
+  --hano-white-200: var(--foundation-white-white-200);
+  --hano-danger-500: var(--foundation-danger-danger-500);
   --hano-success: #34c759;
   --hano-border: #dce2ea;
-  --hano-muted: #667b99;
-  --hano-surface: #f9fafb;
+  --hano-muted: var(--foundation-green-green-300);
+  --hano-surface: var(--foundation-green-green-50);
 
-  /* Landing semantic tokens */
-  --color-bg: var(--hano-white-500);
+  /* Semantic tokens */
+  --color-bg: var(--foundation-white-white-500);
   --color-text: #1a1a1a;
-  --color-text-secondary: #6b6b6b;
-  --color-text-muted: #9a9a9a;
+  --color-text-secondary: var(--foundation-green-green-300);
+  --color-text-muted: var(--foundation-green-green-200);
   --color-border: #e5e5e5;
   --color-border-soft: #ebebeb;
-  --color-surface: #f5f5f5;
-  --color-cta: var(--hano-green-500);
-  --color-cta-text: var(--hano-primary-500);
-  --color-heading: var(--hano-green-500);
+  --color-surface: var(--foundation-green-green-50);
+  --color-cta: var(--foundation-green-green-500);
+  --color-cta-text: var(--foundation-primary-primary-500);
+  --color-heading: var(--foundation-green-green-800);
+  --color-green-500: var(--foundation-green-green-500);
+  --color-green-700: var(--foundation-green-green-700);
+  --color-green-800: var(--foundation-green-green-800);
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -39,6 +68,8 @@
   --text-xl: 1.25rem;
   --text-2xl: 1.5rem;
   --text-3xl: 2rem;
+
+  --font-weight-medium: 500;
 
   --radius-sm: 8px;
   --radius-md: 16px;
@@ -50,6 +81,10 @@
 
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
+
+  --leading-relaxed: 1.65;
+
+  --shell-header-height: 61px;
 }
 
 @theme inline {
@@ -69,11 +104,12 @@
   --color-hano-green-400: #334643;
   --color-hano-green-300: #546462;
   --color-hano-white-500: #fffaf3;
+  --color-hano-white-200: #fffdf9;
   --color-hano-danger-500: #ff383c;
   --color-hano-success: #34c759;
   --color-hano-border: #dce2ea;
-  --color-hano-muted: #667b99;
-  --color-hano-surface: #f9fafb;
+  --color-hano-muted: #546462;
+  --color-hano-surface: #e6e8e8;
 }
 
 body {

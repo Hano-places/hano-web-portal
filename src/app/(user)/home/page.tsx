@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { getFeaturedPlaces } from "@/lib/places-data";
+import { getFeaturedPlaceSeeds } from "@/lib/places-data";
 import { PlaceCard } from "@/components/places/place-card";
 import { HOT_PROMOS, TOP_DISHES } from "@/lib/data/mock-data";
 import { HOME_KPIS, MOMENTS_FEED } from "@/lib/data/feed-data";
@@ -16,7 +16,7 @@ const PERIODS = ["Today", "7d", "30d", "1M"];
 export default function HomePage() {
   const [period, setPeriod] = useState("Today");
   const [tab, setTab] = useState<"dishes" | "places" | "moments">("places");
-  const featured = getFeaturedPlaces();
+  const featured = getFeaturedPlaceSeeds();
 
   return (
     <div className="space-y-8">

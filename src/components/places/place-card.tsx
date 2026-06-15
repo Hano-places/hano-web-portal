@@ -2,34 +2,78 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
+import type { PlaceSeed } from "@/content/places";
+import { formatWeeklyHours, getOpenStatus } from "@/lib/place-hours";
 import { Icon } from "@/components/ui/icon";
-import type { WebPlaceCard } from "@/lib/places-data";
+import styles from "./place-card.module.css";
 
-export function PlaceCard({ place }: { place: WebPlaceCard }) {
+type PlaceCardProps = {
+  place: PlaceSeed;
+  showOrderHint?: boolean;
+};
+
+export function PlaceCard({ place, showOrderHint = true }: PlaceCardProps) {
+  const { isOpen, todayHours } = getOpenStatus(place.hours);
+
   return (
-    <Link href={`/places/${place.id}`}>
-      <Card className="overflow-hidden p-0 transition hover:shadow-md">
-        <div className="relative h-40">
-          <Image src={place.image} alt={place.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
-          {place.verified && (
-            <span className="absolute left-3 top-3 rounded-full bg-hano-primary-500 px-2 py-0.5 text-xs font-semibold text-hano-green-500">
-              Featured
-            </span>
-          )}
+    <Link href={`/places/${place.id}`} className={styles.cardLink}>
+      <article className={`${styles.card} ${styles.grid}`}>
+        <div className={styles.imageWrap}>
+          <Image
+            src={place.image}
+            alt={place.name}
+            fill
+            className={styles.image}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+          <span
+            className={`${styles.statusBadge} ${isOpen ? styles.statusOpen : styles.statusClosed}`}
+          >
+            {isOpen ? "Open now" : "Closed"}
+          </span>
+          {place.featured ? (
+            <span className={styles.featuredBadge}>Featured</span>
+          ) : null}
         </div>
-        <div className="p-4">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-hano-green-500">{place.name}</h3>
-            <span className="flex shrink-0 items-center gap-0.5 text-sm">
-              <Icon name="star" size={14} className="text-hano-primary-600" />
+
+        <div className={styles.body}>
+          <div className={styles.titleRow}>
+            <h3 className={styles.name} title={place.name}>
+              {place.name}
+            </h3>
+            <span className={styles.rating}>
               {place.rating.toFixed(1)}
+              <Icon name="star" size={14} />
             </span>
           </div>
-          <p className="mt-0.5 text-xs text-hano-muted">{place.location}</p>
-          <p className="mt-2 line-clamp-2 text-sm text-hano-muted">{place.description}</p>
+
+          <div className={styles.meta} title={`${place.category} · ${place.location} · ${place.priceRange}`}>
+            <span className={styles.metaText}>
+              {place.category} · {place.location} · {place.priceRange}
+            </span>
+          </div>
+
+          <p className={styles.description} title={place.description}>
+            {place.description}
+          </p>
+
+          <div className={styles.hoursBlock}>
+            <div className={styles.hoursToday}>
+              <Icon name="clock" size={15} className={styles.hoursIcon} />
+              <span className={styles.hoursTodayText}>
+                Today · <strong>{todayHours}</strong>
+              </span>
+            </div>
+          </div>
+
+          {showOrderHint ? (
+            <div className={styles.footer}>
+              <span className={styles.viewLink}>View place</span>
+              <span className={styles.orderBtn}>Order</span>
+            </div>
+          ) : null}
         </div>
-      </Card>
+      </article>
     </Link>
   );
 }
