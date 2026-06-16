@@ -34,7 +34,35 @@ export default function PlaceDetailPage() {
   const { isOpen, todayHours } = getOpenStatus(place.hours);
   const weeklyHours = formatWeeklyHours(place.hours);
   const reviews = place.reviews ?? [];
-  const socialLinks = (place.sameAs ?? []).slice(0, 3);
+  const socialLinks = [...(place.sameAs ?? []), ...(place.website ? [place.website] : [])];
+  const socialProfiles = socialLinks.map((url) => {
+    try {
+      const parsed = new URL(url);
+      const host = parsed.hostname.replace("www.", "").toLowerCase();
+      const slug = parsed.pathname.split("/").filter(Boolean)[0] ?? "";
+      const username = slug ? `@${slug}` : host;
+
+      if (host.includes("instagram")) {
+        return { url, platform: "Instagram", icon: "IG", username };
+      }
+      if (host.includes("facebook")) {
+        return { url, platform: "Facebook", icon: "FB", username };
+      }
+      if (host.includes("x.com") || host.includes("twitter")) {
+        return { url, platform: "X", icon: "X", username };
+      }
+      if (host.includes("tiktok")) {
+        return { url, platform: "TikTok", icon: "TT", username };
+      }
+      if (host.includes("youtube")) {
+        return { url, platform: "YouTube", icon: "YT", username };
+      }
+
+      return { url, platform: "Website", icon: "WEB", username: host };
+    } catch {
+      return { url, platform: "Website", icon: "WEB", username: "website" };
+    }
+  });
   const placePromos = HOT_PROMOS.filter((promo) =>
     promo.location.toLowerCase().includes(place.name.toLowerCase()),
   ).slice(0, 2);
@@ -152,26 +180,6 @@ export default function PlaceDetailPage() {
               </span>
             ))}
           </div>
-          {socialLinks.length > 0 ? (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {socialLinks.map((url) => {
-                let label = "social";
-                try {
-                  const hostname = new URL(url).hostname.replace("www.", "");
-                  label = hostname.split(".")[0] ?? "social";
-                } catch {
-                  label = "social";
-                }
-                return (
-                  <a key={url} href={url} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm" className="capitalize">
-                      {label}
-                    </Button>
-                  </a>
-                );
-              })}
-            </div>
-          ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href={`/places/${id}/menu`}>
@@ -331,6 +339,33 @@ export default function PlaceDetailPage() {
           </div>
         </section>
       </div>
+
+      {socialProfiles.length > 0 ? (
+        <section className="rounded-[var(--radius-card)] border border-hano-border bg-white p-5">
+          <p className="mb-3 text-xs font-semibold tracking-wide text-hano-muted">
+            Stalk us here :)
+          </p>
+          <div className="space-y-2">
+            {socialProfiles.map((profile) => (
+              <a
+                key={profile.url}
+                href={profile.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex cursor-pointer items-center gap-3 rounded-xl border border-hano-border bg-[#fffdfb] px-3 py-2 transition-colors hover:border-[var(--foundation-primary-primary-200)] hover:bg-hano-primary-100"
+              >
+                <span className="inline-flex min-w-10 items-center justify-center rounded-lg border border-hano-border bg-white px-2 py-1 text-[10px] font-semibold text-hano-green-500">
+                  {profile.icon}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-hano-green-500">{profile.platform}</p>
+                  <p className="truncate text-xs text-hano-muted">{profile.username}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {itemCount > 0 ? (
         <div className="sticky bottom-4 flex items-center justify-between gap-4 rounded-full border border-hano-border bg-white px-5 py-3 shadow-lg">
