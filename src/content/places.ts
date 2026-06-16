@@ -247,6 +247,11 @@ export const places: readonly PlaceSeed[] = [
     description:
       "Quiet rooftop café above Ikirezi Bookstore — coffee, light bites, and leafy views.",
     image: IMG.rooftop,
+    website: "https://inzorarooftopcafe.com/",
+    sameAs: [
+      "https://www.instagram.com/inzorarooftopcafe/",
+      "https://www.facebook.com/inzorarooftopcafe/",
+    ],
     tags: ["rooftop", "bookstore", "quiet", "vegetarian"],
     featured: true,
     hours: {
