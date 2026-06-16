@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import type { PlaceSeed } from "@/content/places";
 import { getOpenStatus } from "@/lib/place-hours";
 import { Icon } from "@/components/ui/icon";
+import { TruncateTooltip } from "@/components/ui/truncate-tooltip";
 import {
   CutoutCard,
   CutoutCardAction,
@@ -105,26 +106,28 @@ export function PlaceCutoutCard({
             variants={stagger.container}
           >
             <motion.div className={styles.metaRow} variants={stagger.item}>
-              <span className={styles.metaRowText} title={place.category}>
+              <TruncateTooltip className={styles.metaRowText}>
                 {place.category}
-              </span>
+              </TruncateTooltip>
               <span aria-hidden="true">·</span>
               <span className={styles.price}>{place.priceRange}</span>
             </motion.div>
 
-            <motion.h2 className={styles.title} title={place.name} variants={stagger.item}>
-              {place.name}
+            <motion.h2 className={styles.title} variants={stagger.item}>
+              <TruncateTooltip>{place.name}</TruncateTooltip>
             </motion.h2>
 
-            <motion.p className={styles.description} title={place.description} variants={stagger.item}>
-              {place.description}
+            <motion.p className={styles.description} variants={stagger.item}>
+              <TruncateTooltip>{place.description}</TruncateTooltip>
             </motion.p>
 
             <motion.div variants={stagger.item}>
               <CutoutCardFooter className={styles.footerBorder}>
                 <div className={styles.footerMeta}>
                   <Icon name="location" size={14} />
-                  <span className={styles.footerMetaText}>{place.location}</span>
+                  <TruncateTooltip className={styles.footerMetaText}>
+                    {place.location}
+                  </TruncateTooltip>
                 </div>
                 <span className={styles.footerHours} title={`Today · ${todayHours}`}>
                   {todayHours}

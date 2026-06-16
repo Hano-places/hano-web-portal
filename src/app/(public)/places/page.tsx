@@ -11,6 +11,7 @@ import { PlaceCard } from "@/components/places/place-card";
 import { FilterChip } from "@/components/ui/filter-chip";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { SearchInput } from "@/components/ui/search-input";
 import { LOCATION_CATEGORIES } from "@/lib/data/mock-data";
 
 export default function PlacesPage() {
@@ -44,20 +45,13 @@ export default function PlacesPage() {
         </Link>
       </div>
 
-      <div className="relative max-w-xl">
-        <Icon
-          name="search"
-          size={16}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-hano-muted"
-        />
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by name, area, or cuisine..."
-          className="h-11 w-full cursor-text rounded-full border border-hano-border bg-white pl-9 pr-4 text-sm outline-none transition-colors hover:border-hano-green-300 focus:border-hano-green-500"
-        />
-      </div>
+      <SearchInput
+        fieldSize="md"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search by name, area, or cuisine..."
+        wrapperClassName="max-w-xl"
+      />
 
       <div className="flex flex-wrap gap-2">
         {LOCATION_CATEGORIES.map((cat) => (

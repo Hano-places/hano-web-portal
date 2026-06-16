@@ -6,6 +6,7 @@ import { useAuthStore } from "@/store/auth";
 import { useCartStore } from "@/store/cart";
 import { Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
+import { SearchInput } from "@/components/ui/search-input";
 import { BRAND } from "@/content/images";
 
 export function AppHeader() {
@@ -22,18 +23,10 @@ export function AppHeader() {
         <span className="font-bold text-hano-green-500">Hano</span>
       </Link>
 
-      <div className="relative flex-1">
-        <Icon
-          name="search"
-          size={16}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-hano-muted"
-        />
-        <input
-          type="search"
-          placeholder="Search places, dishes..."
-          className="h-10 w-full max-w-xl cursor-text rounded-full border border-hano-border bg-[#fffdfb] pl-9 pr-4 text-sm text-hano-green-500 outline-none transition-colors placeholder:text-hano-muted hover:border-hano-primary-400 hover:bg-hano-primary-100 focus:border-hano-green-500 focus:bg-white"
-        />
-      </div>
+      <SearchInput
+        placeholder="Search places, dishes..."
+        wrapperClassName="flex-1 max-w-xl"
+      />
 
       <div className="flex items-center gap-2">
         <Link

@@ -1,0 +1,7 @@
+.button {
+  min-width: 7.5rem;
+}
+
+.compact {
+  min-width: 0;
+}

@@ -9,6 +9,7 @@ export type MenuItem = {
   orders: number;
   rating: number;
   image: string;
+  images?: string[];
   category: string;
 };
 
@@ -49,6 +50,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     orders: 312,
     rating: 4.9,
     image: IMG.gourmetBurger,
+    images: [IMG.gourmetBurger, IMG.burgers, IMG.outdoorDining],
     category: "Burgers",
   },
   {
@@ -60,6 +62,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     orders: 245,
     rating: 4.7,
     image: IMG.burgers,
+    images: [IMG.burgers, IMG.gourmetBurger, IMG.joyfulScene],
     category: "Burgers",
   },
   {
@@ -71,6 +74,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     orders: 189,
     rating: 4.8,
     image: IMG.gourmetBurger,
+    images: [IMG.gourmetBurger, IMG.outdoorDining],
     category: "Burgers",
   },
   {
@@ -82,6 +86,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     orders: 312,
     rating: 4.6,
     image: IMG.joyfulScene,
+    images: [IMG.joyfulScene, IMG.outdoorDining, IMG.cozy],
     category: "Grills",
   },
   {
@@ -93,6 +98,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     orders: 420,
     rating: 4.5,
     image: IMG.creamyDrink,
+    images: [IMG.creamyDrink, IMG.modernCafe],
     category: "Beverages",
   },
   {
@@ -104,6 +110,7 @@ export const PLACE_MENU_ITEMS: MenuItem[] = [
     orders: 195,
     rating: 4.4,
     image: IMG.elegantTable,
+    images: [IMG.elegantTable, IMG.aerial, IMG.serene],
     category: "Seafood",
   },
 ];

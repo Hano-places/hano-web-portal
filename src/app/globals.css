@@ -35,6 +35,7 @@
   --hano-primary-500: var(--foundation-primary-primary-500);
   --hano-primary-600: var(--foundation-primary-primary-600);
   --hano-primary-700: var(--foundation-primary-primary-700);
+  --hano-green-50: var(--foundation-green-green-50);
   --hano-green-500: var(--foundation-green-green-500);
   --hano-green-400: var(--foundation-green-green-400);
   --hano-green-300: var(--foundation-green-green-300);
@@ -105,6 +106,7 @@
   --color-hano-primary-500: #c8ff62;
   --color-hano-primary-600: #b6e859;
   --color-hano-primary-700: #8eb546;
+  --color-hano-green-50: #e6e8e8;
   --color-hano-green-500: #001814;
   --color-hano-green-400: #334643;
   --color-hano-green-300: #546462;

@@ -7,16 +7,22 @@ import { useState } from "react";
 import { getPlaceById } from "@/lib/places-data";
 import { HOT_PROMOS, PLACE_MENU_ITEMS } from "@/lib/data/mock-data";
 import { formatWeeklyHours, getOpenStatus } from "@/lib/place-hours";
+import { AddToCartButton } from "@/components/places/add-to-cart-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { FilterChip } from "@/components/ui/filter-chip";
+import { TruncateTooltip } from "@/components/ui/truncate-tooltip";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useCartStore } from "@/store/cart";
 import {
   PlaceReviewProvider,
   RateReviewButton,
 } from "@/components/places/place-review-popover";
+import {
+  MenuItemPopoverProvider,
+  useMenuItemPopover,
+} from "@/components/places/menu-item-popover";
 
 export default function PlaceDetailPage() {
   const params = useParams();
@@ -120,6 +126,13 @@ export default function PlaceDetailPage() {
     menuCategory === "All"
       ? PLACE_MENU_ITEMS.slice(0, 4)
       : PLACE_MENU_ITEMS.filter((i) => i.category === menuCategory).slice(0, 4);
+  const getCategoryRank = (item: (typeof PLACE_MENU_ITEMS)[0]) =>
+    PLACE_MENU_ITEMS.filter((i) => i.category === item.category)
+      .sort((a, b) => {
+        if (b.rating !== a.rating) return b.rating - a.rating;
+        return b.orders - a.orders;
+      })
+      .findIndex((i) => i.id === item.id) + 1;
 
   const handleAdd = (item: (typeof PLACE_MENU_ITEMS)[0]) => {
     if (!requireAuth("add_to_cart")) return;
@@ -137,6 +150,13 @@ export default function PlaceDetailPage() {
   return (
     <PlaceReviewProvider>
     <div className="space-y-8">
+      <Link
+        href="/places"
+        className="inline-flex items-center gap-1 text-sm text-hano-muted transition-colors hover:text-hano-green-500"
+      >
+        <Icon name="chevronLeft" size={16} />
+        Back to places
+      </Link>
       <div className="relative h-56 overflow-hidden rounded-[var(--radius-card)] sm:h-80">
         <Image src={place.image} alt={place.name} fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-hano-green-500/70 via-transparent to-transparent" />
@@ -250,32 +270,9 @@ export default function PlaceDetailPage() {
           ))}
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          {menuItems.map((item) => (
-            <div
-              key={item.id}
-              className="group flex cursor-pointer gap-3 rounded-2xl border border-hano-border p-3 transition-colors hover:border-hano-primary-500 hover:bg-hano-primary-50"
-            >
-              <Image
-                src={item.image}
-                alt={item.name}
-                width={72}
-                height={72}
-                className="h-[72px] w-[72px] shrink-0 rounded-xl object-cover"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-hano-green-500">{item.name}</p>
-                <p className="line-clamp-2 text-xs text-hano-muted">{item.desc}</p>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <span className="font-semibold">{item.price}</span>
-                  <Button size="sm" variant="secondary" onClick={() => handleAdd(item)}>
-                    Add
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <MenuItemPopoverProvider onAddToCart={handleAdd}>
+          <MenuItemsGrid menuItems={menuItems} handleAdd={handleAdd} getCategoryRank={getCategoryRank} />
+        </MenuItemPopoverProvider>
 
         {staticMenu.length > 0 ? (
           <div className="mt-6 border-t border-hano-border pt-4">
@@ -352,14 +349,16 @@ export default function PlaceDetailPage() {
                 href={profile.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex cursor-pointer items-center gap-3 rounded-xl border border-hano-border bg-[#fffdfb] px-3 py-2 transition-colors hover:border-[var(--foundation-primary-primary-200)] hover:bg-hano-primary-100"
+                className="flex cursor-pointer items-center gap-3 rounded-xl border border-hano-border bg-[#fffdfb] px-3 py-2 transition-colors hover:border-(--foundation-primary-primary-200) hover:bg-hano-primary-100"
               >
                 <span className="inline-flex min-w-10 items-center justify-center rounded-lg border border-hano-border bg-white px-2 py-1 text-[10px] font-semibold text-hano-green-500">
                   {profile.icon}
                 </span>
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-hano-green-500">{profile.platform}</p>
-                  <p className="truncate text-xs text-hano-muted">{profile.username}</p>
+                  <TruncateTooltip className="text-xs text-hano-muted">
+                    {profile.username}
+                  </TruncateTooltip>
                 </div>
               </a>
             ))}
@@ -379,5 +378,63 @@ export default function PlaceDetailPage() {
       ) : null}
     </div>
     </PlaceReviewProvider>
+  );
+}
+
+function MenuItemsGrid({
+  menuItems,
+  handleAdd,
+  getCategoryRank,
+}: {
+  menuItems: (typeof PLACE_MENU_ITEMS);
+  handleAdd: (item: (typeof PLACE_MENU_ITEMS)[0]) => void;
+  getCategoryRank: (item: (typeof PLACE_MENU_ITEMS)[0]) => number;
+}) {
+  const { openMenuItem } = useMenuItemPopover();
+
+  return (
+    <div className="grid gap-3 sm:auto-rows-fr sm:grid-cols-2 sm:gap-4">
+      {menuItems.map((item) => (
+        <div
+          key={item.id}
+          className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-hano-border p-3 transition-colors hover:border-hano-primary-500 hover:bg-hano-primary-50"
+          onClick={(event) =>
+            openMenuItem(
+              { item, categoryRank: getCategoryRank(item) },
+              event.currentTarget.getBoundingClientRect(),
+            )
+          }
+        >
+          <div className="relative aspect-[5/4] w-full shrink-0 overflow-hidden rounded-xl bg-hano-surface sm:aspect-[4/3]">
+            <Image
+              src={item.image}
+              alt={item.name}
+              fill
+              sizes="(max-width: 639px) 100vw, (max-width: 1024px) 50vw, 280px"
+              className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            />
+          </div>
+          <div className="flex min-h-0 flex-1 flex-col pt-3">
+            <TruncateTooltip className="font-medium text-hano-green-500">
+              {item.name}
+            </TruncateTooltip>
+            <TruncateTooltip className="mt-1 min-h-8 text-xs text-hano-muted" lines={2}>
+              {item.desc}
+            </TruncateTooltip>
+            <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+              <span className="font-semibold">{item.price}</span>
+              <AddToCartButton
+                size="sm"
+                compact
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleAdd(item);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }

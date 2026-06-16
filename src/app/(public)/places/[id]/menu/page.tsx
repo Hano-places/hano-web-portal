@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { getPlaceById } from "@/lib/places-data";
 import { PLACE_MENU_ITEMS } from "@/lib/data/mock-data";
+import { AddToCartButton } from "@/components/places/add-to-cart-button";
 import { Button } from "@/components/ui/button";
 import { FilterChip } from "@/components/ui/filter-chip";
 import { Icon } from "@/components/ui/icon";
@@ -109,9 +110,7 @@ export default function PlaceMenuPage() {
                     {item.rating} · {item.orders} orders
                   </p>
                 </div>
-                <Button size="sm" onClick={() => handleAdd(item)}>
-                  Add to cart
-                </Button>
+                <AddToCartButton size="sm" onClick={() => handleAdd(item)} />
               </div>
             </div>
           </article>

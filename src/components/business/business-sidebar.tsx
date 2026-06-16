@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon } from "@/components/ui/icon";
+import { SearchInput } from "@/components/ui/search-input";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth";
 import { useBusinessStore } from "@/store/business";
@@ -126,18 +127,10 @@ export function BusinessSidebar() {
 export function BusinessHeader() {
   return (
     <header className="flex h-16 items-center gap-4 border-b border-hano-border bg-white px-6">
-      <div className="relative flex-1">
-        <Icon
-          name="search"
-          size={16}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-hano-muted"
-        />
-        <input
-          type="search"
-          placeholder="Search here..."
-          className="h-10 w-full max-w-xl rounded-full border border-hano-border bg-hano-surface pl-9 pr-4 text-sm outline-none transition-colors hover:border-hano-green-500 focus:border-hano-green-500 cursor-text"
-        />
-      </div>
+      <SearchInput
+        placeholder="Search here..."
+        wrapperClassName="flex-1 max-w-xl"
+      />
       <button type="button" className="relative cursor-pointer rounded-full border border-hano-border px-4 py-2 text-sm transition-colors hover:border-hano-primary-400 hover:bg-hano-primary-50">
         Orders & Reservations
         <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-hano-primary-500 text-xs font-bold">

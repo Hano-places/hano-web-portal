@@ -1,0 +1,93 @@
+.hero {
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 28px 28px 0 0;
+}
+
+.heroMedia {
+  flex-shrink: 0;
+}
+
+.heroNavButton {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--hano-green-500);
+  background: rgb(255 255 255 / 0.88);
+  border: 1px solid var(--hano-border);
+  border-radius: 999px;
+  transform: translateY(-50%);
+}
+
+.heroNavPrev {
+  left: 0.75rem;
+}
+
+.heroNavNext {
+  right: 0.75rem;
+}
+
+.titleBlock {
+  padding: 0.625rem 1rem 0;
+}
+
+.itemName {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.02em;
+  color: var(--color-heading);
+}
+
+.metaChips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.6rem;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  background: #fff;
+  border: 1px solid var(--hano-border);
+  border-radius: var(--radius-pill);
+}
+
+.description {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--hano-border);
+  border-radius: 999px;
+}
+
+.dotActive {
+  background: var(--hano-green-500);
+}
+
+.price {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
