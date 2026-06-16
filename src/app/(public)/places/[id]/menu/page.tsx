@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { FilterChip } from "@/components/ui/filter-chip";
 import { Icon } from "@/components/ui/icon";
 import { useRequireAuth } from "@/hooks/use-require-auth";
+import { useAddToCartWithConflict } from "@/hooks/use-add-to-cart";
+import { useOrderPopover } from "@/components/layout/order-popover";
 import { useCartStore } from "@/store/cart";
 
 export default function PlaceMenuPage() {
@@ -18,7 +20,8 @@ export default function PlaceMenuPage() {
   const id = params.id as string;
   const [category, setCategory] = useState("All");
   const requireAuth = useRequireAuth();
-  const addItem = useCartStore((s) => s.addItem);
+  const { requestAdd, conflictDialog } = useAddToCartWithConflict();
+  const { openOrderPopover } = useOrderPopover();
   const itemCount = useCartStore((s) => s.getItemCount());
   const place = getPlaceById(id);
 
@@ -29,20 +32,24 @@ export default function PlaceMenuPage() {
       : PLACE_MENU_ITEMS.filter((i) => i.category === category);
 
   const handleAdd = (item: (typeof PLACE_MENU_ITEMS)[0]) => {
-    if (!requireAuth("add_to_cart")) return;
-    addItem({
-      id: `${id}-${item.id}`,
-      name: item.name,
-      price: item.price,
-      priceRaw: item.priceRaw,
-      image: item.image,
-      placeId: id,
-      placeName: place?.name ?? "Restaurant",
-    });
+    if (!requireAuth("add_to_cart") || !place) return;
+    requestAdd(
+      {
+        id: `${id}-${item.id}`,
+        name: item.name,
+        price: item.price,
+        priceRaw: item.priceRaw,
+        image: item.image,
+        placeId: id,
+        placeName: place.name,
+      },
+      place.image,
+    );
   };
 
   return (
     <div className="pb-24">
+      {conflictDialog}
       <Link
         href={`/places/${id}`}
         className="inline-flex cursor-pointer items-center gap-1 text-sm text-hano-muted transition-colors hover:text-hano-green-500"
@@ -59,12 +66,15 @@ export default function PlaceMenuPage() {
           </p>
         </div>
         {itemCount > 0 ? (
-          <Link href="/cart">
-            <Button variant="secondary" size="sm" className="gap-2">
-              <Icon name="cart" size={16} />
-              Cart ({itemCount})
-            </Button>
-          </Link>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="gap-2"
+            onClick={(event) => openOrderPopover(event.currentTarget.getBoundingClientRect())}
+          >
+            <Icon name="cart" size={16} />
+            Orders ({itemCount})
+          </Button>
         ) : null}
       </div>
 
@@ -123,11 +133,13 @@ export default function PlaceMenuPage() {
             {itemCount} in cart
           </span>
           <div className="flex gap-2">
-            <Link href="/cart">
-              <Button variant="outline" size="sm">
-                View cart
-              </Button>
-            </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(event) => openOrderPopover(event.currentTarget.getBoundingClientRect())}
+            >
+              View orders
+            </Button>
             <Link href="/checkout/preview">
               <Button size="sm">Checkout</Button>
             </Link>

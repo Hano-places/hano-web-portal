@@ -14,7 +14,7 @@
 .input {
   width: 100%;
   padding-left: 2.25rem;
-  padding-right: 1rem;
+  padding-right: 2.5rem;
   font-size: var(--text-sm);
   color: var(--hano-green-500);
   cursor: text;
@@ -25,6 +25,10 @@
   transition:
     background-color var(--transition-fast),
     border-color var(--transition-fast);
+}
+
+.input::-webkit-search-cancel-button {
+  display: none;
 }
 
 .input::placeholder {
@@ -52,4 +56,29 @@
 
 .inputMd {
   height: 2.75rem;
+}
+
+.clearButton {
+  position: absolute;
+  top: 50%;
+  right: 0.625rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--hano-muted);
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.clearButton:hover {
+  color: var(--hano-green-500);
+  background: var(--hano-primary-100);
 }

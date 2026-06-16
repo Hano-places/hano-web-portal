@@ -4,6 +4,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useCartStore } from "@/store/cart";
 import { PAYMENT_METHODS } from "@/lib/data/mock-data";
+import {
+  formatOrderDateTime,
+  getReadyByTime,
+  PREP_TIME_MINUTES,
+} from "@/lib/order-rules";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AuthGuard } from "@/components/auth/auth-guard";
@@ -18,9 +23,19 @@ function PaymentForm() {
   const [method, setMethod] = useState("momo");
   const [phone, setPhone] = useState("");
 
+  const readyBy =
+    orderType === "direct" ? formatOrderDateTime(getReadyByTime()) : undefined;
+  const pickupLabel =
+    orderType === "pre-order" && pickupTime
+      ? formatOrderDateTime(pickupTime)
+      : undefined;
+
   const handlePay = () => {
     placeOrder(orderType, pickupTime);
-    router.push("/checkout/success");
+    const params = new URLSearchParams({ type: orderType });
+    if (pickupTime) params.set("pickup", pickupTime);
+    if (orderType === "direct") params.set("readyBy", getReadyByTime().toISOString());
+    router.push(`/checkout/success?${params.toString()}`);
   };
 
   return (
@@ -28,13 +43,23 @@ function PaymentForm() {
       <h1 className="text-2xl font-bold">Payment</h1>
       <p className="text-xl font-bold">{formatRwf(getTotal())}</p>
 
+      {orderType === "direct" ? (
+        <p className="rounded-xl border border-hano-border bg-hano-primary-50 px-4 py-3 text-sm text-hano-green-500">
+          Direct order · ready by <strong>{readyBy}</strong> ({PREP_TIME_MINUTES} min prep).
+        </p>
+      ) : (
+        <p className="rounded-xl border border-hano-border bg-hano-primary-50 px-4 py-3 text-sm text-hano-green-500">
+          Pre-order pickup at <strong>{pickupLabel}</strong>.
+        </p>
+      )}
+
       <div className="space-y-2">
         {PAYMENT_METHODS.map((m) => (
           <button
             key={m.id}
             type="button"
             onClick={() => setMethod(m.id)}
-            className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left ${
+            className={`flex w-full cursor-pointer items-center gap-3 rounded-xl border p-4 text-left ${
               method === m.id ? "border-hano-primary-500 bg-hano-primary-50" : ""
             }`}
           >

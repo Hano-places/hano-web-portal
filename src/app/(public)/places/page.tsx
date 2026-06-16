@@ -13,10 +13,14 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { SearchInput } from "@/components/ui/search-input";
 import { LOCATION_CATEGORIES } from "@/lib/data/mock-data";
+import { useCartStore } from "@/store/cart";
+import { useOrderPopover } from "@/components/layout/order-popover";
 
 export default function PlacesPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
+  const itemCount = useCartStore((s) => s.getItemCount());
+  const { openOrderPopover } = useOrderPopover();
 
   const places = useMemo(() => {
     if (query.trim()) {
@@ -37,12 +41,17 @@ export default function PlacesPage() {
             {places.length} spots across Kigali — browse, view menus, and order ahead
           </p>
         </div>
-        <Link href="/cart">
-          <Button variant="outline" size="sm" className="gap-2">
+        {itemCount > 0 ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={(event) => openOrderPopover(event.currentTarget.getBoundingClientRect())}
+          >
             <Icon name="cart" size={16} />
-            View cart
+            Orders ({itemCount})
           </Button>
-        </Link>
+        ) : null}
       </div>
 
       <SearchInput

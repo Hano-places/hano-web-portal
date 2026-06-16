@@ -1,0 +1,77 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(0 24 20 / 0.35);
+  backdrop-filter: blur(2px);
+}
+
+.dialog {
+  width: min(100%, 28rem);
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid var(--hano-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-heading);
+}
+
+.body {
+  margin-top: 0.5rem;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.places {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.placeCard {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--hano-white-200);
+  border: 1px solid var(--hano-border);
+  border-radius: 1rem;
+}
+
+.placeImage {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  object-fit: cover;
+}
+
+.placeLabel {
+  font-size: var(--text-xs);
+  color: var(--hano-muted);
+}
+
+.placeName {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--hano-green-500);
+}
+
+.actions {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.actionButton {
+  width: 100%;
+}

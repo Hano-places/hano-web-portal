@@ -2,7 +2,9 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useCartStore } from "@/store/cart";
+import { formatOrderDateTime } from "@/lib/order-rules";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { formatRwf } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -11,6 +13,7 @@ function OrderDetail() {
   const params = useParams();
   const id = params.id as string;
   const orders = useCartStore((s) => s.orders);
+  const reorder = useCartStore((s) => s.reorder);
   const order = orders.find((o) => o.id === id);
 
   if (!order) {
@@ -22,10 +25,25 @@ function OrderDetail() {
       <Link href="/orders" className="text-sm text-hano-muted hover:underline">
         ← Back to orders
       </Link>
-      <h1 className="text-2xl font-bold">{order.placeName}</h1>
+      <div className="flex items-center gap-3">
+        {order.placeImage ? (
+          <Image
+            src={order.placeImage}
+            alt=""
+            width={56}
+            height={56}
+            className="h-14 w-14 rounded-xl object-cover"
+          />
+        ) : null}
+        <div>
+          <h1 className="text-2xl font-bold">{order.placeName}</h1>
+          <p className="text-sm text-hano-muted">{order.status}</p>
+        </div>
+      </div>
       <p className="text-sm text-hano-muted">
         {order.orderType === "pre-order" ? "Pre-order" : "Direct order"}
-        {order.pickupTime && ` · Pickup ${order.pickupTime}`}
+        {order.pickupTime ? ` · Pickup ${formatOrderDateTime(order.pickupTime)}` : ""}
+        {order.readyBy ? ` · Ready by ${formatOrderDateTime(order.readyBy)}` : ""}
       </p>
       <div className="space-y-2">
         {order.items.map((item) => (
@@ -41,8 +59,8 @@ function OrderDetail() {
         <span>Total</span>
         <span>{formatRwf(order.total)}</span>
       </div>
-      <Button variant="secondary" className="w-full">
-        Re-order
+      <Button variant="secondary" className="w-full" onClick={() => reorder(order.id)}>
+        Reorder
       </Button>
     </div>
   );

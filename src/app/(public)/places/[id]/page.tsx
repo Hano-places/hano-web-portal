@@ -14,6 +14,7 @@ import { Icon } from "@/components/ui/icon";
 import { FilterChip } from "@/components/ui/filter-chip";
 import { TruncateTooltip } from "@/components/ui/truncate-tooltip";
 import { useRequireAuth } from "@/hooks/use-require-auth";
+import { useAddToCartWithConflict } from "@/hooks/use-add-to-cart";
 import { useCartStore } from "@/store/cart";
 import {
   PlaceReviewProvider,
@@ -23,12 +24,14 @@ import {
   MenuItemPopoverProvider,
   useMenuItemPopover,
 } from "@/components/places/menu-item-popover";
+import { useOrderPopover } from "@/components/layout/order-popover";
 
 export default function PlaceDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const requireAuth = useRequireAuth();
-  const addItem = useCartStore((s) => s.addItem);
+  const { requestAdd, conflictDialog } = useAddToCartWithConflict();
+  const { openOrderPopover } = useOrderPopover();
   const itemCount = useCartStore((s) => s.getItemCount());
   const [menuCategory, setMenuCategory] = useState("All");
   const place = getPlaceById(id);
@@ -136,20 +139,24 @@ export default function PlaceDetailPage() {
 
   const handleAdd = (item: (typeof PLACE_MENU_ITEMS)[0]) => {
     if (!requireAuth("add_to_cart")) return;
-    addItem({
-      id: `${id}-${item.id}`,
-      name: item.name,
-      price: item.price,
-      priceRaw: item.priceRaw,
-      image: item.image,
-      placeId: id,
-      placeName: place.name,
-    });
+    requestAdd(
+      {
+        id: `${id}-${item.id}`,
+        name: item.name,
+        price: item.price,
+        priceRaw: item.priceRaw,
+        image: item.image,
+        placeId: id,
+        placeName: place.name,
+      },
+      place.image,
+    );
   };
 
   return (
     <PlaceReviewProvider>
-    <div className="space-y-8">
+      {conflictDialog}
+      <div className="space-y-8">
       <Link
         href="/places"
         className="inline-flex items-center gap-1 text-sm text-hano-muted transition-colors hover:text-hano-green-500"
@@ -371,9 +378,12 @@ export default function PlaceDetailPage() {
           <span className="text-sm font-medium">
             {itemCount} item{itemCount !== 1 ? "s" : ""} in cart
           </span>
-          <Link href="/cart">
-            <Button size="sm">Checkout</Button>
-          </Link>
+          <Button
+            size="sm"
+            onClick={(event) => openOrderPopover(event.currentTarget.getBoundingClientRect())}
+          >
+            View orders
+          </Button>
         </div>
       ) : null}
     </div>
@@ -393,11 +403,11 @@ function MenuItemsGrid({
   const { openMenuItem } = useMenuItemPopover();
 
   return (
-    <div className="grid gap-3 sm:auto-rows-fr sm:grid-cols-2 sm:gap-4">
+    <div className="grid gap-2.5 sm:auto-rows-fr sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
       {menuItems.map((item) => (
         <div
           key={item.id}
-          className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-hano-border p-3 transition-colors hover:border-hano-primary-500 hover:bg-hano-primary-50"
+          className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-hano-border p-2.5 transition-colors hover:border-hano-primary-500 hover:bg-hano-primary-50"
           onClick={(event) =>
             openMenuItem(
               { item, categoryRank: getCategoryRank(item) },
@@ -405,23 +415,23 @@ function MenuItemsGrid({
             )
           }
         >
-          <div className="relative aspect-[5/4] w-full shrink-0 overflow-hidden rounded-xl bg-hano-surface sm:aspect-[4/3]">
+          <div className="relative aspect-[3/2] w-full shrink-0 overflow-hidden rounded-lg bg-hano-surface">
             <Image
               src={item.image}
               alt={item.name}
               fill
-              sizes="(max-width: 639px) 100vw, (max-width: 1024px) 50vw, 280px"
+              sizes="(max-width: 639px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
               className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
             />
           </div>
-          <div className="flex min-h-0 flex-1 flex-col pt-3">
-            <TruncateTooltip className="font-medium text-hano-green-500">
+          <div className="flex min-h-0 flex-1 flex-col pt-2">
+            <TruncateTooltip className="text-sm font-medium text-hano-green-500">
               {item.name}
             </TruncateTooltip>
-            <TruncateTooltip className="mt-1 min-h-8 text-xs text-hano-muted" lines={2}>
+            <TruncateTooltip className="mt-0.5 min-h-6 text-xs text-hano-muted" lines={2}>
               {item.desc}
             </TruncateTooltip>
-            <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+            <div className="mt-auto flex items-center justify-between gap-1.5 pt-2">
               <span className="font-semibold">{item.price}</span>
               <AddToCartButton
                 size="sm"

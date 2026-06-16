@@ -1,5 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import {
+  getReadyByTime,
+  isActiveOrderStatus,
+  isPreviousOrderStatus,
+  PREP_TIME_MINUTES,
+} from "@/lib/order-rules";
 
 export interface CartItem {
   id: string;
@@ -10,6 +16,14 @@ export interface CartItem {
   qty: number;
   placeId: string;
   placeName: string;
+}
+
+export interface DraftCart {
+  placeId: string;
+  placeName: string;
+  placeImage: string;
+  items: CartItem[];
+  updatedAt: string;
 }
 
 export interface Order {
@@ -23,34 +37,76 @@ export interface Order {
   date: string;
   orderType: "direct" | "pre-order";
   pickupTime?: string;
+  readyBy?: string;
 }
+
+export type PlaceMeta = {
+  placeId: string;
+  placeName: string;
+  placeImage: string;
+};
 
 interface CartState {
   items: CartItem[];
+  drafts: DraftCart[];
   orders: Order[];
   currentPlaceId: string | null;
   currentPlaceName: string | null;
   currentPlaceImage: string | null;
 
-  addItem: (item: Omit<CartItem, "qty">) => void;
+  getPlaceConflict: (placeId: string) => PlaceMeta | null;
+  addItem: (item: Omit<CartItem, "qty">, placeImage: string) => void;
+  addItemWithStrategy: (
+    item: Omit<CartItem, "qty">,
+    placeImage: string,
+    strategy: "replace" | "save-draft",
+  ) => void;
   removeItem: (id: string) => void;
   updateQty: (id: string, qty: number) => void;
   clearCart: () => void;
+  saveCurrentAsDraft: () => void;
+  loadDraft: (placeId: string) => void;
   placeOrder: (type: "direct" | "pre-order", pickupTime?: string) => void;
+  reorder: (orderId: string) => void;
+  clearPreviousOrders: () => void;
+  getActiveOrders: () => Order[];
+  getPreviousOrders: () => Order[];
   getTotal: () => number;
   getItemCount: () => number;
+}
+
+function syncPlaceMeta(items: CartItem[], placeImage: string, item: Omit<CartItem, "qty">) {
+  return {
+    items,
+    currentPlaceId: item.placeId,
+    currentPlaceName: item.placeName,
+    currentPlaceImage: placeImage,
+  };
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      drafts: [],
       orders: [],
       currentPlaceId: null,
       currentPlaceName: null,
       currentPlaceImage: null,
 
-      addItem: (item) => {
+      getPlaceConflict: (placeId) => {
+        const { items, currentPlaceId, currentPlaceName, currentPlaceImage } = get();
+        if (!items.length || !currentPlaceId || currentPlaceId === placeId) {
+          return null;
+        }
+        return {
+          placeId: currentPlaceId,
+          placeName: currentPlaceName ?? "Current place",
+          placeImage: currentPlaceImage ?? "",
+        };
+      },
+
+      addItem: (item, placeImage) => {
         const { items } = get();
         const existing = items.find((i) => i.id === item.id);
         if (existing) {
@@ -58,19 +114,68 @@ export const useCartStore = create<CartState>()(
             items: items.map((i) =>
               i.id === item.id ? { ...i, qty: i.qty + 1 } : i,
             ),
+            currentPlaceImage: placeImage,
           });
-        } else {
-          set({
-            items: [...items, { ...item, qty: 1 }],
-            currentPlaceId: item.placeId,
-            currentPlaceName: item.placeName,
-            currentPlaceImage: item.image,
-          });
+          return;
         }
+
+        set(syncPlaceMeta([...items, { ...item, qty: 1 }], placeImage, item));
+      },
+
+      addItemWithStrategy: (item, placeImage, strategy) => {
+        const state = get();
+        if (strategy === "save-draft" && state.items.length && state.currentPlaceId) {
+          get().saveCurrentAsDraft();
+        } else if (strategy === "replace") {
+          get().clearCart();
+        }
+        get().addItem(item, placeImage);
+      },
+
+      saveCurrentAsDraft: () => {
+        const { items, currentPlaceId, currentPlaceName, currentPlaceImage, drafts } = get();
+        if (!items.length || !currentPlaceId) return;
+
+        const nextDraft: DraftCart = {
+          placeId: currentPlaceId,
+          placeName: currentPlaceName ?? "",
+          placeImage: currentPlaceImage ?? "",
+          items: [...items],
+          updatedAt: new Date().toISOString(),
+        };
+
+        const withoutPlace = drafts.filter((d) => d.placeId !== currentPlaceId);
+        set({
+          drafts: [nextDraft, ...withoutPlace],
+          items: [],
+          currentPlaceId: null,
+          currentPlaceName: null,
+          currentPlaceImage: null,
+        });
+      },
+
+      loadDraft: (placeId) => {
+        const { drafts } = get();
+        const draft = drafts.find((d) => d.placeId === placeId);
+        if (!draft) return;
+
+        get().clearCart();
+        set({
+          items: draft.items,
+          currentPlaceId: draft.placeId,
+          currentPlaceName: draft.placeName,
+          currentPlaceImage: draft.placeImage,
+          drafts: drafts.filter((d) => d.placeId !== placeId),
+        });
       },
 
       removeItem: (id) => {
-        set({ items: get().items.filter((i) => i.id !== id) });
+        const items = get().items.filter((i) => i.id !== id);
+        if (!items.length) {
+          get().clearCart();
+          return;
+        }
+        set({ items });
       },
 
       updateQty: (id, qty) => {
@@ -92,9 +197,11 @@ export const useCartStore = create<CartState>()(
         }),
 
       placeOrder: (type, pickupTime) => {
-        const { items, orders, currentPlaceId, currentPlaceName, currentPlaceImage } =
-          get();
+        const { items, orders, currentPlaceId, currentPlaceName, currentPlaceImage } = get();
         if (!items.length || !currentPlaceId) return;
+
+        const readyBy =
+          type === "direct" ? getReadyByTime().toISOString() : undefined;
 
         const order: Order = {
           id: Date.now().toString(),
@@ -106,12 +213,42 @@ export const useCartStore = create<CartState>()(
           status: "Pending",
           date: new Date().toISOString(),
           orderType: type,
-          pickupTime,
+          pickupTime: type === "pre-order" ? pickupTime : undefined,
+          readyBy,
         };
 
         set({ orders: [order, ...orders] });
         get().clearCart();
       },
+
+      reorder: (orderId) => {
+        const order = get().orders.find((o) => o.id === orderId);
+        if (!order) return;
+
+        const conflict = get().getPlaceConflict(order.placeId);
+        if (conflict) {
+          get().saveCurrentAsDraft();
+        } else {
+          get().clearCart();
+        }
+
+        set({
+          items: order.items.map((item) => ({ ...item })),
+          currentPlaceId: order.placeId,
+          currentPlaceName: order.placeName,
+          currentPlaceImage: order.placeImage,
+        });
+      },
+
+      clearPreviousOrders: () => {
+        set({
+          orders: get().orders.filter((o) => isActiveOrderStatus(o.status)),
+        });
+      },
+
+      getActiveOrders: () => get().orders.filter((o) => isActiveOrderStatus(o.status)),
+
+      getPreviousOrders: () => get().orders.filter((o) => isPreviousOrderStatus(o.status)),
 
       getTotal: () => get().items.reduce((sum, i) => sum + i.priceRaw * i.qty, 0),
 
@@ -120,3 +257,5 @@ export const useCartStore = create<CartState>()(
     { name: "@hano/cart" },
   ),
 );
+
+export { PREP_TIME_MINUTES };
