@@ -31,7 +31,7 @@ export function BusinessSidebar() {
   return (
     <aside className="flex h-full w-64 flex-col border-r border-hano-border bg-white">
       <div className="flex items-center justify-between border-b border-hano-border p-4">
-        <Link href="/business/overview" className="text-xl font-bold text-hano-green-500">
+        <Link href="/business/overview" className="cursor-pointer text-xl font-bold text-hano-green-500 transition-colors hover:text-hano-green-400">
           Hano
         </Link>
       </div>
@@ -48,7 +48,7 @@ export function BusinessSidebar() {
                 key={href}
                 href={href}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
+                  "flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
                   active
                     ? "bg-hano-primary-500 text-hano-green-500"
                     : "text-hano-green-400 hover:bg-hano-surface",
@@ -77,7 +77,7 @@ export function BusinessSidebar() {
                 key={href}
                 href={href}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
+                  "flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
                   active
                     ? "bg-hano-primary-500 text-hano-green-500"
                     : "text-hano-green-400 hover:bg-hano-surface",
@@ -94,7 +94,7 @@ export function BusinessSidebar() {
       <div className="border-t border-hano-border p-4">
         <Link
           href="/home"
-          className="mb-3 flex items-center gap-2 text-sm text-hano-muted hover:text-hano-green-500"
+          className="mb-3 flex cursor-pointer items-center gap-2 text-sm text-hano-muted transition-colors hover:text-hano-green-500"
         >
           <Icon name="chevronLeft" size={16} />
           User Portal
@@ -112,7 +112,7 @@ export function BusinessSidebar() {
           <button
             type="button"
             onClick={() => logout()}
-            className="rounded-lg p-1.5 hover:bg-hano-surface"
+            className="cursor-pointer rounded-lg p-1.5 transition-colors hover:bg-hano-surface"
             aria-label="Log out"
           >
             <Icon name="logout" size={16} />
@@ -135,16 +135,16 @@ export function BusinessHeader() {
         <input
           type="search"
           placeholder="Search here..."
-          className="h-10 w-full max-w-xl rounded-full border border-hano-border bg-hano-surface pl-9 pr-4 text-sm outline-none focus:border-hano-green-500"
+          className="h-10 w-full max-w-xl rounded-full border border-hano-border bg-hano-surface pl-9 pr-4 text-sm outline-none transition-colors hover:border-hano-green-500 focus:border-hano-green-500 cursor-text"
         />
       </div>
-      <button type="button" className="relative rounded-full border border-hano-border px-4 py-2 text-sm">
+      <button type="button" className="relative cursor-pointer rounded-full border border-hano-border px-4 py-2 text-sm transition-colors hover:border-hano-primary-400 hover:bg-hano-primary-50">
         Orders & Reservations
         <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-hano-primary-500 text-xs font-bold">
           12
         </span>
       </button>
-      <button type="button" className="relative rounded-full border border-hano-border px-4 py-2 text-sm">
+      <button type="button" className="relative cursor-pointer rounded-full border border-hano-border px-4 py-2 text-sm transition-colors hover:border-hano-primary-400 hover:bg-hano-primary-50">
         Notifications
         <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-hano-primary-500 text-xs font-bold">
           12

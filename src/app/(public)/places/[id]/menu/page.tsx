@@ -44,7 +44,7 @@ export default function PlaceMenuPage() {
     <div className="pb-24">
       <Link
         href={`/places/${id}`}
-        className="inline-flex items-center gap-1 text-sm text-hano-muted transition-colors hover:text-hano-green-500"
+        className="inline-flex cursor-pointer items-center gap-1 text-sm text-hano-muted transition-colors hover:text-hano-green-500"
       >
         <Icon name="chevronLeft" size={16} />
         Back to {place?.name ?? "Place"}
@@ -82,7 +82,7 @@ export default function PlaceMenuPage() {
         {items.map((item) => (
           <article
             key={item.id}
-            className="group flex gap-4 rounded-[var(--radius-card)] border border-hano-border bg-white p-4 transition-colors hover:border-hano-primary-400 hover:bg-hano-primary-50/40"
+            className="group flex cursor-pointer gap-4 rounded-[var(--radius-card)] border border-hano-border bg-white p-4 transition-colors hover:border-hano-primary-400 hover:bg-hano-primary-50/40"
           >
             <Link href={`/places/${id}/menu/${item.id}`} className="shrink-0">
               <Image

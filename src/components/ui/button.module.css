@@ -35,14 +35,14 @@
 }
 
 .outline {
-  background-color: var(--color-bg);
+  background-color: #fffdfb;
   color: var(--color-text-secondary);
-  border-color: var(--color-border-soft);
+  border-color: var(--foundation-green-green-50);
 }
 
 .outline:hover:not(:disabled) {
   color: var(--color-text);
-  background-color: var(--color-surface);
+  background-color: var(--foundation-primary-primary-100);
   border-color: var(--color-border);
 }
 

@@ -122,3 +122,36 @@ body {
   color: var(--hano-green-500);
   font-family: var(--font-nunito), system-ui, sans-serif;
 }
+
+::selection {
+  color: var(--color-green-800);
+  background-color: var(--foundation-primary-primary-300);
+}
+
+::-moz-selection {
+  color: var(--color-green-800);
+  background-color: var(--foundation-primary-primary-300);
+}
+
+@layer base {
+  a[href],
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="link"],
+  summary,
+  label[for],
+  select {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  :disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="image"]):not([type="range"]):not([type="color"]),
+  textarea {
+    cursor: text;
+  }
+}

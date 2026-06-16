@@ -92,7 +92,7 @@ export function UserSidebar({ isAuthenticated }: UserSidebarProps) {
             <button
               type="button"
               onClick={() => logout()}
-              className="rounded-lg p-2 text-hano-muted transition-colors hover:bg-hano-primary-50 hover:text-hano-green-500"
+              className="cursor-pointer rounded-lg p-2 text-hano-muted transition-colors hover:bg-hano-primary-50 hover:text-hano-green-500"
               aria-label="Log out"
             >
               <Icon name="logout" size={18} />

@@ -40,15 +40,15 @@ export default function CartPage() {
             <p className="font-semibold">{item.price}</p>
           </div>
           <div className="flex items-center gap-2">
-            <button type="button" onClick={() => updateQty(item.id, item.qty - 1)} className="h-8 w-8 rounded-lg border">
+            <button type="button" onClick={() => updateQty(item.id, item.qty - 1)} className="h-8 w-8 cursor-pointer rounded-lg border transition-colors hover:border-hano-primary-400 hover:bg-hano-primary-50">
               -
             </button>
             <span>{item.qty}</span>
-            <button type="button" onClick={() => updateQty(item.id, item.qty + 1)} className="h-8 w-8 rounded-lg border">
+            <button type="button" onClick={() => updateQty(item.id, item.qty + 1)} className="h-8 w-8 cursor-pointer rounded-lg border transition-colors hover:border-hano-primary-400 hover:bg-hano-primary-50">
               +
             </button>
           </div>
-          <button type="button" onClick={() => removeItem(item.id)} className="text-sm text-hano-danger-500">
+          <button type="button" onClick={() => removeItem(item.id)} className="cursor-pointer text-sm text-hano-danger-500 transition-opacity hover:opacity-80">
             Remove
           </button>
         </div>

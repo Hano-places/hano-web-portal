@@ -13,6 +13,10 @@ import { Icon } from "@/components/ui/icon";
 import { FilterChip } from "@/components/ui/filter-chip";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useCartStore } from "@/store/cart";
+import {
+  PlaceReviewProvider,
+  RateReviewButton,
+} from "@/components/places/place-review-popover";
 
 export default function PlaceDetailPage() {
   const params = useParams();
@@ -51,6 +55,7 @@ export default function PlaceDetailPage() {
   };
 
   return (
+    <PlaceReviewProvider>
     <div className="space-y-8">
       <div className="relative h-56 overflow-hidden rounded-[var(--radius-card)] sm:h-80">
         <Image src={place.image} alt={place.name} fill className="object-cover" priority />
@@ -100,16 +105,7 @@ export default function PlaceDetailPage() {
           <Link href={`/places/${id}/menu`}>
             <Button size="lg">Order now</Button>
           </Link>
-          <Button
-            variant="outline"
-            onClick={() => {
-              if (requireAuth("review")) {
-                window.location.href = `/places/${id}/review`;
-              }
-            }}
-          >
-            Rate & Review
-          </Button>
+          <RateReviewButton place={place} size="lg" />
         </div>
       </div>
 
@@ -119,7 +115,7 @@ export default function PlaceDetailPage() {
             <h2 className="text-lg font-semibold text-hano-green-500">Menu</h2>
             <p className="text-sm text-hano-muted">Popular items — add to cart and order ahead</p>
           </div>
-          <Link href={`/places/${id}/menu`} className="text-sm font-medium text-hano-green-500 hover:underline">
+          <Link href={`/places/${id}/menu`} className="cursor-pointer text-sm font-medium text-hano-green-500 transition-colors hover:underline">
             Full menu →
           </Link>
         </div>
@@ -139,7 +135,7 @@ export default function PlaceDetailPage() {
           {menuItems.map((item) => (
             <div
               key={item.id}
-              className="group flex gap-3 rounded-2xl border border-hano-border p-3 transition-colors hover:border-hano-primary-500 hover:bg-hano-primary-50"
+              className="group flex cursor-pointer gap-3 rounded-2xl border border-hano-border p-3 transition-colors hover:border-hano-primary-500 hover:bg-hano-primary-50"
             >
               <Image
                 src={item.image}
@@ -236,5 +232,6 @@ export default function PlaceDetailPage() {
         </div>
       ) : null}
     </div>
+    </PlaceReviewProvider>
   );
 }

@@ -19,7 +19,7 @@ export function LoginModal() {
         <button
           type="button"
           onClick={closeLoginModal}
-          className="absolute right-4 top-4 rounded-lg p-1 hover:bg-hano-surface"
+          className="absolute right-4 top-4 cursor-pointer rounded-lg p-1 transition-colors hover:bg-hano-surface"
           aria-label="Close"
         >
           <Icon name="close" size={20} />

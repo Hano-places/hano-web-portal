@@ -1,13 +1,23 @@
 import { cn } from "@/lib/utils";
 import { HTMLAttributes } from "react";
 
-export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+type CardProps = HTMLAttributes<HTMLDivElement> & {
+  interactive?: boolean;
+};
+
+export function Card({ className, interactive, onClick, ...props }: CardProps) {
+  const isInteractive = interactive || typeof onClick === "function";
+
   return (
     <div
       className={cn(
-        "rounded-2xl border border-hano-border bg-white p-5 transition-colors hover:border-hano-primary-300",
+        "rounded-2xl border border-hano-border bg-white p-5",
+        isInteractive
+          ? "cursor-pointer transition-colors hover:border-hano-primary-300"
+          : "cursor-default",
         className,
       )}
+      onClick={onClick}
       {...props}
     />
   );

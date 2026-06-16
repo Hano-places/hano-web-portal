@@ -55,7 +55,7 @@ export default function PlacesPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by name, area, or cuisine..."
-          className="h-11 w-full rounded-full border border-hano-border bg-white pl-9 pr-4 text-sm outline-none transition-colors hover:border-hano-green-300 focus:border-hano-green-500"
+          className="h-11 w-full cursor-text rounded-full border border-hano-border bg-white pl-9 pr-4 text-sm outline-none transition-colors hover:border-hano-green-300 focus:border-hano-green-500"
         />
       </div>
 
@@ -79,7 +79,7 @@ export default function PlacesPage() {
               setQuery("");
               setCategory("All");
             }}
-            className="mt-3 text-sm font-medium text-hano-green-500 underline-offset-2 hover:underline"
+            className="mt-3 cursor-pointer text-sm font-medium text-hano-green-500 underline-offset-2 transition-colors hover:underline"
           >
             Clear filters
           </button>

@@ -29,7 +29,7 @@ export default function ProfilePage() {
         <button
           type="button"
           onClick={() => logout()}
-          className="ml-auto rounded-lg p-2 hover:bg-hano-surface"
+          className="ml-auto cursor-pointer rounded-lg p-2 transition-colors hover:bg-hano-surface"
           aria-label="Log out"
         >
           <Icon name="logout" size={20} />

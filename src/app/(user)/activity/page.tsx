@@ -45,15 +45,15 @@ export default function ActivityPage() {
           <h2 className="mb-3 font-semibold">Recent Orders</h2>
           <div className="space-y-2">
             {orders.map((order) => (
-              <Card key={order.id} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="text-sm font-medium">Order #{order.id.slice(0, 8)}</p>
-                  <p className="text-xs text-hano-muted">{order.placeName}</p>
-                </div>
-                <Link href={`/orders/${order.id}`} className="text-sm text-hano-muted hover:underline">
-                  View
-                </Link>
-              </Card>
+              <Link key={order.id} href={`/orders/${order.id}`} className="block cursor-pointer">
+                <Card interactive className="flex items-center justify-between py-3">
+                  <div>
+                    <p className="text-sm font-medium">Order #{order.id.slice(0, 8)}</p>
+                    <p className="text-xs text-hano-muted">{order.placeName}</p>
+                  </div>
+                  <span className="text-sm text-hano-muted">View</span>
+                </Card>
+              </Link>
             ))}
           </div>
         </section>

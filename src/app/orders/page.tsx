@@ -19,7 +19,7 @@ function OrdersList() {
         <Link
           key={order.id}
           href={`/orders/${order.id}`}
-          className="flex gap-4 rounded-xl border border-hano-border p-4 transition hover:shadow-sm"
+          className="flex cursor-pointer gap-4 rounded-xl border border-hano-border p-4 transition hover:border-hano-primary-300 hover:bg-hano-primary-50/40"
         >
           {order.placeImage && (
             <Image src={order.placeImage} alt="" width={64} height={64} className="h-16 w-16 shrink-0 rounded-lg object-cover" />

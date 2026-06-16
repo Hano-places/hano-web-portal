@@ -31,7 +31,7 @@ export function AppHeader() {
         <input
           type="search"
           placeholder="Search places, dishes..."
-          className="h-10 w-full max-w-xl cursor-text rounded-full border border-hano-border bg-hano-white-500 pl-9 pr-4 text-sm text-hano-green-500 outline-none transition-colors placeholder:text-hano-muted hover:border-hano-primary-400 hover:bg-hano-primary-50 focus:border-hano-green-500 focus:bg-white"
+          className="h-10 w-full max-w-xl cursor-text rounded-full border border-hano-border bg-[#fffdfb] pl-9 pr-4 text-sm text-hano-green-500 outline-none transition-colors placeholder:text-hano-muted hover:border-hano-primary-400 hover:bg-hano-primary-100 focus:border-hano-green-500 focus:bg-white"
         />
       </div>
 
@@ -50,15 +50,15 @@ export function AppHeader() {
         </Link>
 
         {isAuthenticated ? (
-          <Link href="/business/overview" className="hidden sm:block">
-            <Button variant="outline" size="sm" className="transition-colors hover:border-hano-green-400 hover:bg-hano-primary-50">
+          <Link href="/business/overview" className="hidden cursor-pointer sm:block">
+            <Button variant="secondary" size="sm">
               Business
             </Button>
           </Link>
         ) : (
           <>
             <Link href="/login">
-              <Button variant="outline" size="sm" className="transition-colors hover:border-hano-green-400 hover:bg-hano-primary-50">
+              <Button variant="outline" size="sm">
                 Log in
               </Button>
             </Link>
