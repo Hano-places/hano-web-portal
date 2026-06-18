@@ -12,8 +12,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { PromoType } from "@/lib/data/mock-data";
+import type { PromoType, PromoIncludedItem } from "@/lib/data/mock-data";
 import { Button } from "@/components/ui/button";
+import { CartItemAction } from "@/components/places/cart-item-action";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import {
   CutoutCardImage,
   CutoutCardMedia,
@@ -46,6 +48,7 @@ export type PromoDetail = {
     id: string;
     name: string;
     price?: string;
+    priceRaw?: number;
     image?: string;
   }[];
 };
@@ -67,11 +70,16 @@ export function usePromoPopover() {
 function PromoPanel({
   promo,
   menuHref,
+  placeId,
+  onAddToCart,
 }: {
   promo: PromoDetail;
   menuHref: string;
+  placeId: string;
+  onAddToCart?: (item: PromoIncludedItem) => void;
 }) {
   const titleId = useId();
+  const requireAuth = useRequireAuth();
   const { closeFloatingPanel } = useFloatingPanel();
   const statusPinClass =
     promo.status === "Active"
@@ -111,49 +119,65 @@ function PromoPanel({
       }
       titleId={titleId}
     >
-      <div className={panelStyles.panelScroll}>
-        <div className={styles.titleBlock}>
-          <h2 id={titleId} className={styles.promoTitle}>
-            {promo.title}
-          </h2>
-          <p className={styles.promoSub}>{promo.placeName}</p>
+      <div className={panelStyles.panelLayout}>
+        <div className={panelStyles.panelBodyScroll}>
+          <div className={styles.titleBlock}>
+            <h2 id={titleId} className={styles.promoTitle}>
+              {promo.title}
+            </h2>
+            <p className={styles.promoSub}>{promo.placeName}</p>
+          </div>
+
+          <FloatingPanelHeader>Promo details</FloatingPanelHeader>
+          <FloatingPanelBody className="space-y-3">
+            <div className={styles.metaChips}>
+              <span className={`${styles.chip} ${styles.chipType}`}>{promo.promoType}</span>
+              <span className={`${styles.chip} ${styles.chipActive}`}>{promo.status}</span>
+            </div>
+            <p className={styles.description}>{promo.description}</p>
+          </FloatingPanelBody>
+
+          <FloatingPanelHeader>Items included</FloatingPanelHeader>
+          <FloatingPanelBody>
+            <div className={styles.itemList}>
+              {promo.includedItems.map((item) => {
+                const cartItemId = `${placeId}-${item.id}`;
+
+                return (
+                  <div key={item.id} className={styles.itemRow}>
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt=""
+                        width={44}
+                        height={44}
+                        className={styles.itemImage}
+                      />
+                    ) : (
+                      <div className={`${styles.itemImage} bg-hano-surface`} />
+                    )}
+                    <div className={styles.itemMeta}>
+                      <p className={styles.itemName}>{item.name}</p>
+                      {item.price ? <p className={styles.itemPrice}>{item.price}</p> : null}
+                    </div>
+                    <CartItemAction
+                      cartItemId={cartItemId}
+                      size="sm"
+                      iconOnly
+                      className={styles.itemOrderAction}
+                      onAdd={() => {
+                        if (!requireAuth("add_to_cart")) return;
+                        onAddToCart?.(item);
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </FloatingPanelBody>
         </div>
 
-        <FloatingPanelHeader>Promo details</FloatingPanelHeader>
-        <FloatingPanelBody className="space-y-3">
-          <div className={styles.metaChips}>
-            <span className={`${styles.chip} ${styles.chipType}`}>{promo.promoType}</span>
-            <span className={`${styles.chip} ${styles.chipActive}`}>{promo.status}</span>
-          </div>
-          <p className={styles.description}>{promo.description}</p>
-        </FloatingPanelBody>
-
-        <FloatingPanelHeader>Items included</FloatingPanelHeader>
-        <FloatingPanelBody>
-          <div className={styles.itemList}>
-            {promo.includedItems.map((item) => (
-              <div key={item.id} className={styles.itemRow}>
-                {item.image ? (
-                  <Image
-                    src={item.image}
-                    alt=""
-                    width={44}
-                    height={44}
-                    className={styles.itemImage}
-                  />
-                ) : (
-                  <div className={`${styles.itemImage} bg-hano-surface`} />
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className={styles.itemName}>{item.name}</p>
-                  {item.price ? <p className={styles.itemPrice}>{item.price}</p> : null}
-                </div>
-              </div>
-            ))}
-          </div>
-        </FloatingPanelBody>
-
-        <FloatingPanelFooter>
+        <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
           <Link href={menuHref} onClick={() => closeFloatingPanel()}>
             <Button className={styles.orderButton} variant="secondary">
               Order now
@@ -169,9 +193,13 @@ function PromoPanel({
 function PromoPopoverInner({
   children,
   menuHref,
+  placeId,
+  onAddToCart,
 }: {
   children: ReactNode;
   menuHref: string;
+  placeId: string;
+  onAddToCart?: (item: PromoIncludedItem) => void;
 }) {
   const [selected, setSelected] = useState<PromoDetail | null>(null);
   const { openFloatingPanel, isOpen } = useFloatingPanel();
@@ -196,7 +224,14 @@ function PromoPopoverInner({
   return (
     <PromoPopoverContext.Provider value={value}>
       {children}
-      {selected ? <PromoPanel promo={selected} menuHref={menuHref} /> : null}
+      {selected ? (
+        <PromoPanel
+          promo={selected}
+          menuHref={menuHref}
+          placeId={placeId}
+          onAddToCart={onAddToCart}
+        />
+      ) : null}
     </PromoPopoverContext.Provider>
   );
 }
@@ -204,13 +239,19 @@ function PromoPopoverInner({
 export function PromoPopoverProvider({
   children,
   menuHref,
+  placeId,
+  onAddToCart,
 }: {
   children: ReactNode;
   menuHref: string;
+  placeId: string;
+  onAddToCart?: (item: PromoIncludedItem) => void;
 }) {
   return (
     <FloatingPanelRoot>
-      <PromoPopoverInner menuHref={menuHref}>{children}</PromoPopoverInner>
+      <PromoPopoverInner menuHref={menuHref} placeId={placeId} onAddToCart={onAddToCart}>
+        {children}
+      </PromoPopoverInner>
     </FloatingPanelRoot>
   );
 }

@@ -72,7 +72,6 @@ function WishlistItemRow({
           {title}
         </Link>
         <p className={styles.itemSub}>{subtitle}</p>
-        {pinned ? <span className={styles.pinnedBadge}>Pinned</span> : null}
       </div>
       <div className={styles.itemActions}>
         <button

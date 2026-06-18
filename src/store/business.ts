@@ -1,9 +1,32 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { createSafePersistStorage } from "@/lib/safe-persist-storage";
+import { slugifyBusinessName } from "@/lib/business-place-bridge";
+import type { PromoType } from "@/lib/data/mock-data";
+
+export type BusinessMenuItem = {
+  id: string;
+  name: string;
+  desc: string;
+  price: string;
+  priceRaw: number;
+  image: string;
+  category: string;
+};
+
+export type BusinessPromo = {
+  id: string;
+  title: string;
+  description: string;
+  promoType: PromoType;
+  status: "Active" | "Upcoming" | "Ended";
+  image: string;
+  includedItemIds: string[];
+};
 
 export interface BusinessProfile {
   id: string;
+  placeSlug: string;
   name: string;
   category: string;
   description: string;
@@ -13,6 +36,9 @@ export interface BusinessProfile {
   logoUrl: string;
   bannerUrl: string;
   hours: Record<string, { open: string; close: string; closed?: boolean }>;
+  sameAs: string[];
+  menuItems: BusinessMenuItem[];
+  promos: BusinessPromo[];
   createdAt: string;
 }
 
@@ -23,9 +49,12 @@ export interface BusinessOnboardingDraft {
   address: string;
   phone: string;
   website: string;
+  instagram: string;
+  facebook: string;
   logoUrl: string;
   bannerUrl: string;
   hours: Record<string, { open: string; close: string; closed?: boolean }>;
+  sameAs: string[];
   step: number;
 }
 
@@ -47,6 +76,12 @@ interface BusinessState {
   resetDraft: () => void;
   completeOnboarding: () => BusinessProfile;
   clearProfile: () => void;
+  updateProfile: (patch: Partial<BusinessProfile>) => void;
+  addMenuItem: (item: Omit<BusinessMenuItem, "id">) => void;
+  removeMenuItem: (id: string) => void;
+  addPromo: (promo: Omit<BusinessPromo, "id">) => void;
+  removePromo: (id: string) => void;
+  updatePromoStatus: (id: string, status: BusinessPromo["status"]) => void;
 }
 
 const emptyDraft: BusinessOnboardingDraft = {
@@ -56,11 +91,27 @@ const emptyDraft: BusinessOnboardingDraft = {
   address: "",
   phone: "",
   website: "",
+  instagram: "",
+  facebook: "",
   logoUrl: "",
   bannerUrl: "",
   hours: defaultHours,
+  sameAs: [],
   step: 0,
 };
+
+function normalizePersistedProfile(
+  profile: BusinessProfile | null,
+): BusinessProfile | null {
+  if (!profile) return null;
+  return {
+    ...profile,
+    placeSlug: profile.placeSlug ?? slugifyBusinessName(profile.name),
+    sameAs: profile.sameAs ?? [],
+    menuItems: profile.menuItems ?? [],
+    promos: profile.promos ?? [],
+  };
+}
 
 export const useBusinessStore = create<BusinessState>()(
   persist(
@@ -74,8 +125,12 @@ export const useBusinessStore = create<BusinessState>()(
 
       completeOnboarding: () => {
         const { draft } = get();
+        const sameAs = [draft.instagram, draft.facebook]
+          .map((url) => url.trim())
+          .filter(Boolean);
         const profile: BusinessProfile = {
           id: `biz-${Date.now()}`,
+          placeSlug: slugifyBusinessName(draft.name),
           name: draft.name,
           category: draft.category,
           description: draft.description,
@@ -85,6 +140,9 @@ export const useBusinessStore = create<BusinessState>()(
           logoUrl: draft.logoUrl,
           bannerUrl: draft.bannerUrl,
           hours: draft.hours,
+          sameAs,
+          menuItems: [],
+          promos: [],
           createdAt: new Date().toISOString(),
         };
         set({ profile, draft: emptyDraft });
@@ -92,8 +150,88 @@ export const useBusinessStore = create<BusinessState>()(
       },
 
       clearProfile: () => set({ profile: null, draft: emptyDraft }),
+
+      updateProfile: (patch) => {
+        const { profile } = get();
+        if (!profile) return;
+        set({ profile: { ...profile, ...patch } });
+      },
+
+      addMenuItem: (item) => {
+        const { profile } = get();
+        if (!profile) return;
+        set({
+          profile: {
+            ...profile,
+            menuItems: [
+              { ...item, id: `menu-${Date.now()}` },
+              ...profile.menuItems,
+            ],
+          },
+        });
+      },
+
+      removeMenuItem: (id) => {
+        const { profile } = get();
+        if (!profile) return;
+        set({
+          profile: {
+            ...profile,
+            menuItems: profile.menuItems.filter((item) => item.id !== id),
+            promos: profile.promos.map((promo) => ({
+              ...promo,
+              includedItemIds: promo.includedItemIds.filter((itemId) => itemId !== id),
+            })),
+          },
+        });
+      },
+
+      addPromo: (promo) => {
+        const { profile } = get();
+        if (!profile) return;
+        set({
+          profile: {
+            ...profile,
+            promos: [{ ...promo, id: `promo-${Date.now()}` }, ...profile.promos],
+          },
+        });
+      },
+
+      removePromo: (id) => {
+        const { profile } = get();
+        if (!profile) return;
+        set({
+          profile: {
+            ...profile,
+            promos: profile.promos.filter((promo) => promo.id !== id),
+          },
+        });
+      },
+
+      updatePromoStatus: (id, status) => {
+        const { profile } = get();
+        if (!profile) return;
+        set({
+          profile: {
+            ...profile,
+            promos: profile.promos.map((promo) =>
+              promo.id === id ? { ...promo, status } : promo,
+            ),
+          },
+        });
+      },
     }),
-    { name: "@hano/business", storage: createSafePersistStorage() },
+    {
+      name: "@hano/business",
+      storage: createSafePersistStorage(),
+      merge: (persisted, current) => {
+        const merged = { ...current, ...(persisted as Partial<BusinessState>) };
+        return {
+          ...merged,
+          profile: normalizePersistedProfile(merged.profile),
+        };
+      },
+    },
   ),
 );
 

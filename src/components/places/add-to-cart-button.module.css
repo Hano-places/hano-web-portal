@@ -9,3 +9,10 @@
 .icon {
   flex-shrink: 0;
 }
+
+.iconOnly {
+  min-width: 0;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+}

@@ -30,6 +30,9 @@ import {
   usePromoPopover,
   type PromoDetail,
 } from "@/components/places/promo-popover";
+import type { PromoIncludedItem } from "@/lib/data/mock-data";
+import { resolvePromoItemPricing } from "@/lib/promo-pricing";
+import { useBusinessPlaceOverrides } from "@/lib/business-place-bridge";
 import { OrderStickyBar } from "@/components/layout/order-popover";
 import { PlaceSocialLinks } from "@/components/places/place-social-links";
 import { WishlistDishButton, WishlistPlaceButton } from "@/components/wishlist/wishlist-save-button";
@@ -40,18 +43,33 @@ export default function PlaceDetailPage() {
   const requireAuth = useRequireAuth();
   const { requestAdd, conflictDialog } = useAddToCartWithConflict();
   const [menuCategory, setMenuCategory] = useState("All");
-  const place = getPlaceById(id);
+  const businessOverrides = useBusinessPlaceOverrides(id);
+  const seedPlace = getPlaceById(id);
+  const place = seedPlace ?? businessOverrides?.placeSeed;
 
   if (!place) {
     return <div className="py-12 text-center text-hano-muted">Place not found</div>;
   }
 
-  const { isOpen, todayHours } = getOpenStatus(place.hours);
+  const weeklyHours = businessOverrides?.weeklyHours ?? place.hours;
+  const catalogMenu =
+    businessOverrides && businessOverrides.menuItems.length > 0
+      ? businessOverrides.menuItems
+      : PLACE_MENU_ITEMS;
+
+  const { isOpen, todayHours } = getOpenStatus(weeklyHours);
   const reviews = place.reviews ?? [];
-  const socialLinks = [...(place.sameAs ?? []), ...(place.website ? [place.website] : [])];
-  const placePromos = HOT_PROMOS.filter((promo) =>
-    promo.location.toLowerCase().includes(place.name.toLowerCase()),
-  ).slice(0, 2);
+  const socialLinks =
+    businessOverrides && businessOverrides.socialLinks.length > 0
+      ? businessOverrides.socialLinks
+      : [...(place.sameAs ?? []), ...(place.website ? [place.website] : [])];
+  const businessPromos = businessOverrides?.promos ?? [];
+  const placePromos =
+    businessPromos.length > 0
+      ? businessPromos
+      : HOT_PROMOS.filter((promo) =>
+          promo.location.toLowerCase().includes(place.name.toLowerCase()),
+        ).slice(0, 2);
   const getPromoType = (title: string, explicit?: PromoType): PromoType => {
     if (explicit) return explicit;
     const normalized = title.toLowerCase();
@@ -96,10 +114,11 @@ export default function PlaceDetailPage() {
             image: place.image,
             type: "Discount" as const,
             description: `Stack bonus points on your next order at ${place.name}. Valid while this promo is active.`,
-            includedItems: PLACE_MENU_ITEMS.slice(0, 3).map((item) => ({
+            includedItems: catalogMenu.slice(0, 3).map((item) => ({
               id: item.id,
               name: item.name,
               price: item.price,
+              priceRaw: item.priceRaw,
               image: item.image,
             })),
           },
@@ -111,16 +130,20 @@ export default function PlaceDetailPage() {
             image: place.image,
             type: "Add-on" as const,
             description: `Midweek add-on deals on popular dishes at ${place.name}.`,
-            includedItems: PLACE_MENU_ITEMS.slice(2, 5).map((item) => ({
+            includedItems: catalogMenu.slice(2, 5).map((item) => ({
               id: item.id,
               name: item.name,
               price: item.price,
+              priceRaw: item.priceRaw,
               image: item.image,
             })),
           },
         ];
   const promosWithStatus = activePromos.map((promo) => {
-    const status = getPromoStatus(promo.title);
+    const businessPromo = businessOverrides?.profile.promos.find(
+      (entry) => entry.id === promo.id,
+    );
+    const status = businessPromo?.status ?? getPromoStatus(promo.title);
     const dotClass =
       status === "Active"
         ? "bg-hano-primary-500"
@@ -131,24 +154,25 @@ export default function PlaceDetailPage() {
       ...promo,
       status,
       dotClass,
-      promoType: getPromoType(promo.title, promo.type),
+      promoType: getPromoType(promo.title, businessPromo?.promoType ?? promo.type),
     };
   });
   const staticMenu = place.menu?.flatMap((section) => section.items) ?? [];
-  const menuCategories = ["All", ...new Set(PLACE_MENU_ITEMS.map((i) => i.category))];
+  const menuCategories = ["All", ...new Set(catalogMenu.map((i) => i.category))];
   const menuItems =
     menuCategory === "All"
-      ? PLACE_MENU_ITEMS.slice(0, 4)
-      : PLACE_MENU_ITEMS.filter((i) => i.category === menuCategory).slice(0, 4);
-  const getCategoryRank = (item: (typeof PLACE_MENU_ITEMS)[0]) =>
-    PLACE_MENU_ITEMS.filter((i) => i.category === item.category)
+      ? catalogMenu.slice(0, 4)
+      : catalogMenu.filter((i) => i.category === menuCategory).slice(0, 4);
+  const getCategoryRank = (item: (typeof catalogMenu)[0]) =>
+    catalogMenu
+      .filter((i) => i.category === item.category)
       .sort((a, b) => {
         if (b.rating !== a.rating) return b.rating - a.rating;
         return b.orders - a.orders;
       })
       .findIndex((i) => i.id === item.id) + 1;
 
-  const handleAdd = (item: (typeof PLACE_MENU_ITEMS)[0]) => {
+  const handleAdd = (item: (typeof catalogMenu)[0]) => {
     if (!requireAuth("add_to_cart")) return;
     requestAdd(
       {
@@ -157,6 +181,24 @@ export default function PlaceDetailPage() {
         price: item.price,
         priceRaw: item.priceRaw,
         image: item.image,
+        placeId: id,
+        placeName: place.name,
+      },
+      place.image,
+    );
+  };
+
+  const handlePromoItemAdd = (item: PromoIncludedItem) => {
+    if (!requireAuth("add_to_cart")) return;
+    const { price, priceRaw, image } = resolvePromoItemPricing(item, catalogMenu);
+
+    requestAdd(
+      {
+        id: `${id}-${item.id}`,
+        name: item.name,
+        price,
+        priceRaw,
+        image: image || place.image,
         placeId: id,
         placeName: place.name,
       },
@@ -250,7 +292,11 @@ export default function PlaceDetailPage() {
           <h2 className="text-lg font-semibold text-hano-green-500">Restaurant Promos</h2>
           <p className="text-sm text-hano-muted">Latest offers added by this restaurant</p>
         </div>
-        <PromoPopoverProvider menuHref={`/places/${id}/menu`}>
+        <PromoPopoverProvider
+          menuHref={`/places/${id}/menu`}
+          placeId={id}
+          onAddToCart={handlePromoItemAdd}
+        >
           <PlacePromosGrid
             promos={promosWithStatus}
             placeName={place.name}
@@ -310,7 +356,7 @@ export default function PlaceDetailPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <section>
           <h2 className="mb-3 font-semibold text-hano-green-500">Hours</h2>
-          <PlaceWeeklyHours hours={place.hours} />
+          <PlaceWeeklyHours hours={weeklyHours} />
         </section>
 
         <section>
@@ -386,6 +432,7 @@ function PlacePromosGrid({
         id: item.id,
         name: item.name,
         price: item.price,
+        priceRaw: item.priceRaw,
         image: item.image,
       })),
   });

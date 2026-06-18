@@ -68,7 +68,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.625rem;
   background: var(--hano-white-200);
   border: 1px solid var(--hano-border);
   border-radius: 0.875rem;
@@ -77,8 +77,22 @@
 .itemImage {
   width: 2.75rem;
   height: 2.75rem;
+  flex-shrink: 0;
   border-radius: 0.625rem;
   object-fit: cover;
+}
+
+.itemMeta {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.itemOrderAction {
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .itemName {

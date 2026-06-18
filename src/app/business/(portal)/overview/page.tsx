@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { businessApi } from "@/lib/business/api-adapter";
+import { useBusinessStore } from "@/store/business";
 import { KpiCard } from "@/components/business/kpi-card";
 import {
   OrdersCategoryChart,
@@ -17,6 +19,7 @@ import type { BusinessDashboardData } from "@/lib/business/api-adapter";
 const PERIODS = ["Custom", "Today", "7d", "30d", "1M", "6M", "1Y"];
 
 export default function BusinessOverviewPage() {
+  const profile = useBusinessStore((state) => state.profile);
   const [data, setData] = useState<BusinessDashboardData | null>(null);
   const [period, setPeriod] = useState("30d");
 
@@ -31,12 +34,25 @@ export default function BusinessOverviewPage() {
   return (
     <div className="flex gap-6">
       <div className="min-w-0 flex-1 space-y-6">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Restaurant Overview</h1>
+            <h1 className="text-2xl font-bold">
+              {profile?.name ?? "Restaurant"} Overview
+            </h1>
             <p className="text-sm text-hano-muted">
               Track revenue, orders, and customer satisfaction
             </p>
+            {profile ? (
+              <p className="mt-1 text-xs text-hano-muted">
+                Public page:{" "}
+                <Link
+                  href={`/places/${profile.placeSlug}`}
+                  className="font-medium text-hano-green-500 hover:underline"
+                >
+                  /places/{profile.placeSlug}
+                </Link>
+              </p>
+            ) : null}
           </div>
           <Button size="sm">Today&apos;s Status</Button>
         </div>

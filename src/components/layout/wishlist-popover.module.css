@@ -101,19 +101,6 @@
   border-color: var(--hano-primary-400);
 }
 
-.pinnedBadge {
-  display: inline-flex;
-  margin-top: 0.35rem;
-  padding: 0.1rem 0.45rem;
-  font-size: 0.6rem;
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--hano-green-500);
-  background: var(--hano-primary-100);
-  border-radius: var(--radius-pill);
-}
-
 .footerLink {
   font-size: var(--text-sm);
   font-weight: var(--font-weight-medium);

@@ -129,50 +129,52 @@ function MenuItemPanel({
       }
       titleId={titleId}
     >
-      <div className={panelStyles.panelScroll}>
-        <div className={styles.titleBlock}>
-          <h2 id={titleId} className={styles.itemName}>
-            {payload.item.name}
-          </h2>
-          <WishlistDishButton
-            placeId={placeId}
-            placeName={placeName}
-            itemId={payload.item.id}
-            itemName={payload.item.name}
-            itemImage={payload.item.image}
-            itemPrice={payload.item.price}
-            itemPriceRaw={payload.item.priceRaw}
-            size="md"
-            className={styles.titleWishlistButton}
-          />
-        </div>
-        <FloatingPanelHeader>Item details</FloatingPanelHeader>
-        <FloatingPanelBody className="space-y-3">
-          <div className={styles.metaChips}>
-            <span className={styles.chip}>
-              #{payload.categoryRank} in {payload.item.category}
-            </span>
-            <span className={styles.chip}>
-              <Icon name="star" size={12} className="text-hano-primary-600" />
-              {payload.item.rating.toFixed(1)}
-            </span>
+      <div className={panelStyles.panelLayout}>
+        <div className={panelStyles.panelBodyScroll}>
+          <div className={styles.titleBlock}>
+            <h2 id={titleId} className={styles.itemName}>
+              {payload.item.name}
+            </h2>
+            <WishlistDishButton
+              placeId={placeId}
+              placeName={placeName}
+              itemId={payload.item.id}
+              itemName={payload.item.name}
+              itemImage={payload.item.image}
+              itemPrice={payload.item.price}
+              itemPriceRaw={payload.item.priceRaw}
+              size="md"
+              className={styles.titleWishlistButton}
+            />
           </div>
-          <p className={styles.description}>{payload.item.desc}</p>
-          {images.length > 1 ? (
-            <div className={styles.dots}>
-              {images.map((img, idx) => (
-                <button
-                  key={`${img}-${idx}`}
-                  type="button"
-                  className={`${styles.dot} ${idx === activeIdx ? styles.dotActive : ""}`}
-                  onClick={() => setActiveIdx(idx)}
-                  aria-label={`Go to image ${idx + 1}`}
-                />
-              ))}
+          <FloatingPanelHeader>Item details</FloatingPanelHeader>
+          <FloatingPanelBody className="space-y-3">
+            <div className={styles.metaChips}>
+              <span className={styles.chip}>
+                #{payload.categoryRank} in {payload.item.category}
+              </span>
+              <span className={styles.chip}>
+                <Icon name="star" size={12} className="text-hano-primary-600" />
+                {payload.item.rating.toFixed(1)}
+              </span>
             </div>
-          ) : null}
-        </FloatingPanelBody>
-        <FloatingPanelFooter className={styles.footer}>
+            <p className={styles.description}>{payload.item.desc}</p>
+            {images.length > 1 ? (
+              <div className={styles.dots}>
+                {images.map((img, idx) => (
+                  <button
+                    key={`${img}-${idx}`}
+                    type="button"
+                    className={`${styles.dot} ${idx === activeIdx ? styles.dotActive : ""}`}
+                    onClick={() => setActiveIdx(idx)}
+                    aria-label={`Go to image ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            ) : null}
+          </FloatingPanelBody>
+        </div>
+        <FloatingPanelFooter className={`${panelStyles.panelFooterFixed} ${styles.footer}`}>
           <span className={styles.price}>{payload.item.price}</span>
           <div className={styles.footerActions}>
             <CartItemAction

@@ -9,6 +9,7 @@ type CartItemActionProps = {
   onAdd: () => void;
   size?: "sm" | "md" | "lg";
   compact?: boolean;
+  iconOnly?: boolean;
   className?: string;
 };
 
@@ -17,6 +18,7 @@ export function CartItemAction({
   onAdd,
   size = "sm",
   compact = true,
+  iconOnly = false,
   className = "",
 }: CartItemActionProps) {
   const qty = useCartItemQty(cartItemId);
@@ -31,6 +33,7 @@ export function CartItemAction({
       <AddToCartButton
         size={size}
         compact={compact}
+        iconOnly={iconOnly || compact}
         className={className}
         onClick={(event) => {
           event.stopPropagation();

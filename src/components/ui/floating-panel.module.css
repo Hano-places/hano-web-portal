@@ -78,6 +78,27 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.panelLayout {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panelBodyScroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.panelFooterFixed {
+  flex-shrink: 0;
+}
+
 .panelTitleWrap {
   flex-shrink: 0;
   padding: 1rem 1.25rem 0.75rem;

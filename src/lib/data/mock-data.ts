@@ -28,6 +28,7 @@ export type PromoIncludedItem = {
   id: string;
   name: string;
   price?: string;
+  priceRaw?: number;
   image?: string;
 };
 

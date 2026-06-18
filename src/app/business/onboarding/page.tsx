@@ -83,6 +83,16 @@ function OnboardingWizard() {
               value={draft.website}
               onChange={(e) => setDraft({ website: e.target.value })}
             />
+            <Input
+              placeholder="Instagram URL (optional)"
+              value={draft.instagram}
+              onChange={(e) => setDraft({ instagram: e.target.value })}
+            />
+            <Input
+              placeholder="Facebook URL (optional)"
+              value={draft.facebook}
+              onChange={(e) => setDraft({ facebook: e.target.value })}
+            />
           </>
         )}
 
@@ -106,9 +116,33 @@ function OnboardingWizard() {
             {Object.entries(draft.hours ?? defaultHours).map(([day, hours]) => (
               <div key={day} className="flex items-center gap-2 text-sm capitalize">
                 <span className="w-24">{day}</span>
-                <Input type="time" defaultValue={hours.open} className="flex-1" />
+                <Input
+                  type="time"
+                  value={hours.open}
+                  onChange={(e) =>
+                    setDraft({
+                      hours: {
+                        ...draft.hours,
+                        [day]: { ...hours, open: e.target.value },
+                      },
+                    })
+                  }
+                  className="flex-1"
+                />
                 <span>–</span>
-                <Input type="time" defaultValue={hours.close} className="flex-1" />
+                <Input
+                  type="time"
+                  value={hours.close}
+                  onChange={(e) =>
+                    setDraft({
+                      hours: {
+                        ...draft.hours,
+                        [day]: { ...hours, close: e.target.value },
+                      },
+                    })
+                  }
+                  className="flex-1"
+                />
               </div>
             ))}
           </div>
