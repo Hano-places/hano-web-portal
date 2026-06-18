@@ -9,6 +9,7 @@ import { useCartStore } from "@/store/cart";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { SearchWithSuggestions } from "@/components/search/search-with-suggestions";
+import { NotificationsTriggerButton } from "@/components/layout/notifications-popover";
 import { OrderTriggerButton } from "@/components/layout/order-popover";
 import { WishlistTriggerButton } from "@/components/layout/wishlist-popover";
 import {
@@ -195,6 +196,7 @@ export function AppHeader() {
       </FloatingPanelRoot>
 
       <div className="ml-auto flex shrink-0 items-center gap-2">
+        <NotificationsTriggerButton />
         <WishlistTriggerButton />
         <OrderTriggerButton itemCount={itemCount} />
 

@@ -134,6 +134,17 @@ function MenuItemPanel({
           <h2 id={titleId} className={styles.itemName}>
             {payload.item.name}
           </h2>
+          <WishlistDishButton
+            placeId={placeId}
+            placeName={placeName}
+            itemId={payload.item.id}
+            itemName={payload.item.name}
+            itemImage={payload.item.image}
+            itemPrice={payload.item.price}
+            itemPriceRaw={payload.item.priceRaw}
+            size="md"
+            className={styles.titleWishlistButton}
+          />
         </div>
         <FloatingPanelHeader>Item details</FloatingPanelHeader>
         <FloatingPanelBody className="space-y-3">
@@ -164,16 +175,6 @@ function MenuItemPanel({
         <FloatingPanelFooter className={styles.footer}>
           <span className={styles.price}>{payload.item.price}</span>
           <div className={styles.footerActions}>
-            <WishlistDishButton
-              placeId={placeId}
-              placeName={placeName}
-              itemId={payload.item.id}
-              itemName={payload.item.name}
-              itemImage={payload.item.image}
-              itemPrice={payload.item.price}
-              itemPriceRaw={payload.item.priceRaw}
-              size="md"
-            />
             <CartItemAction
               cartItemId={`${placeId}-${payload.item.id}`}
               size="md"

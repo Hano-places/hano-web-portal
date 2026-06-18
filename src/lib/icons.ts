@@ -20,6 +20,7 @@ import {
   Logout01Icon,
   Megaphone01Icon,
   Message01Icon,
+  Notification01Icon,
   Restaurant01Icon,
   Search01Icon,
   SecurityCheckIcon,
@@ -71,6 +72,7 @@ export const iconMap = {
   finance: Wallet01Icon,
   insights: AnalyticsUpIcon,
   marketing: Megaphone01Icon,
+  notification: Notification01Icon,
   headphones: HeadphonesIcon,
   chevronLeft: ArrowLeft01Icon,
 } as const;

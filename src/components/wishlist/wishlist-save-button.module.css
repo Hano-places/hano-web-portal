@@ -36,6 +36,34 @@
   z-index: 2;
   background: rgb(255 255 255 / 0.92);
   box-shadow: 0 2px 8px rgb(0 24 20 / 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+@media (hover: hover) {
+  :global(.group:hover) .buttonOverlay,
+  :global(.group:focus-within) .buttonOverlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.buttonOverlay.buttonSaved {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (hover: none) {
+  .buttonOverlay.buttonSaved {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .buttonSaved {
