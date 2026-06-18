@@ -24,12 +24,24 @@ export type DishItem = {
   image: string;
 };
 
+export type PromoIncludedItem = {
+  id: string;
+  name: string;
+  price?: string;
+  image?: string;
+};
+
+export type PromoType = "Discount" | "Free Item" | "Add-on";
+
 export type PromoItem = {
   id: string;
   title: string;
   location: string;
   points: number;
   image: string;
+  type?: PromoType;
+  description?: string;
+  includedItems?: PromoIncludedItem[];
 };
 
 export type WalletActivity = {
@@ -133,6 +145,13 @@ export const HOT_PROMOS: PromoItem[] = [
     location: "Kigali Grill House Restaurant",
     points: 250,
     image: IMG.burgers,
+    type: "Discount",
+    description: "Save 10% on selected grill favourites when you order before the holiday rush ends.",
+    includedItems: [
+      { id: "p1-1", name: "Bacon Supreme Burger", price: "2,000 RWF", image: IMG.burgers },
+      { id: "p1-2", name: "Classic Cheeseburger", price: "1,800 RWF", image: IMG.burgers },
+      { id: "p1-3", name: "Grilled Tilapia", price: "6,500 RWF", image: IMG.elegantTable },
+    ],
   },
   {
     id: "2",
@@ -140,6 +159,13 @@ export const HOT_PROMOS: PromoItem[] = [
     location: "Bourbon Coffee Kacyiru",
     points: 150,
     image: IMG.creamyDrink,
+    type: "Free Item",
+    description: "Order any main dish and get a complimentary coffee — hot or iced.",
+    includedItems: [
+      { id: "p2-1", name: "Creamy Cappuccino", price: "Free add-on", image: IMG.creamyDrink },
+      { id: "p2-2", name: "Iced Latte", price: "Free add-on", image: IMG.modernCafe },
+      { id: "p2-3", name: "Seasonal Pastry", price: "Free add-on", image: IMG.cozy },
+    ],
   },
 ];
 
@@ -148,11 +174,19 @@ export const WALLET_ACTIVITIES: WalletActivity[] = [
   { id: "2", title: "Reward points earned", amount: "+150 pts", date: "2026-06-09", type: "credit" },
 ];
 
+export const PAYMENT = {
+  mtnMomo: "/payment-logos/mtn-momo.svg",
+  airtelMomo: "/payment-logos/airtel-momo.svg",
+  card: "/payment-logos/card.svg",
+} as const;
+
 export const PAYMENT_METHODS = [
-  { id: "momo", name: "MTN MoMo", icon: "📱" },
-  { id: "airtel", name: "Airtel Money", icon: "📲" },
-  { id: "card", name: "Visa / Mastercard", icon: "💳" },
-];
+  { id: "momo", name: "MTN Momo", logo: PAYMENT.mtnMomo },
+  { id: "airtel", name: "Airtel Momo", logo: PAYMENT.airtelMomo },
+  { id: "card", name: "Card", logo: PAYMENT.card },
+] as const;
+
+export type PaymentMethodId = (typeof PAYMENT_METHODS)[number]["id"];
 
 export const LOCATION_CATEGORIES = ["All", "Restaurants", "Cafés", "Lounges", "Bars"];
 

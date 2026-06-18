@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { createSafePersistStorage } from "@/lib/safe-persist-storage";
 
 export interface BusinessProfile {
   id: string;
@@ -92,7 +93,7 @@ export const useBusinessStore = create<BusinessState>()(
 
       clearProfile: () => set({ profile: null, draft: emptyDraft }),
     }),
-    { name: "@hano/business" },
+    { name: "@hano/business", storage: createSafePersistStorage() },
   ),
 );
 

@@ -1,0 +1,49 @@
+.button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  color: var(--hano-muted);
+  background: #fff;
+  border: 1px solid var(--hano-border);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.button:hover {
+  color: #c43d5c;
+  border-color: #f0b8c8;
+  background: #fff5f8;
+}
+
+.buttonSm {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.45rem;
+}
+
+.buttonOverlay {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  z-index: 2;
+  background: rgb(255 255 255 / 0.92);
+  box-shadow: 0 2px 8px rgb(0 24 20 / 0.08);
+}
+
+.buttonSaved {
+  color: #c43d5c;
+  background: #fff0f4;
+  border-color: #f0b8c8;
+}
+
+.buttonSaved:hover {
+  background: #ffe8ee;
+}

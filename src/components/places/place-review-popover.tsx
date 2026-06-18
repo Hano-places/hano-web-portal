@@ -190,7 +190,7 @@ function PlaceReviewInner({ children }: { children: ReactNode }) {
   const openPlaceReview = useCallback(
     (place: PlaceSeed, rect: DOMRect | null) => {
       setSelectedPlace(place);
-      openFloatingPanel(rect, "Rate & Review", "anchored");
+      openFloatingPanel(rect, "Rate & Review", "centered");
     },
     [openFloatingPanel],
   );

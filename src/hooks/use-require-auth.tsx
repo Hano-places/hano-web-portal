@@ -11,7 +11,8 @@ export type AuthAction =
   | "upload_moment"
   | "create_business"
   | "view_orders"
-  | "view_profile";
+  | "view_profile"
+  | "save_wishlist";
 
 interface AuthGateContextValue {
   showLoginModal: boolean;

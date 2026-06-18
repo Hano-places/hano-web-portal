@@ -5,17 +5,18 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { getPlaceById } from "@/lib/places-data";
-import { HOT_PROMOS, PLACE_MENU_ITEMS } from "@/lib/data/mock-data";
-import { formatWeeklyHours, getOpenStatus } from "@/lib/place-hours";
-import { AddToCartButton } from "@/components/places/add-to-cart-button";
+import { HOT_PROMOS, PLACE_MENU_ITEMS, type PromoType } from "@/lib/data/mock-data";
+import { getOpenStatus } from "@/lib/place-hours";
+import { PlaceWeeklyHours } from "@/components/places/place-weekly-hours";
+import { CartItemAction, InCartBadge, useCartItemQty } from "@/components/places/cart-item-action";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { FilterChip } from "@/components/ui/filter-chip";
+import { Price } from "@/components/ui/price";
 import { TruncateTooltip } from "@/components/ui/truncate-tooltip";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useAddToCartWithConflict } from "@/hooks/use-add-to-cart";
-import { useCartStore } from "@/store/cart";
 import {
   PlaceReviewProvider,
   RateReviewButton,
@@ -24,15 +25,20 @@ import {
   MenuItemPopoverProvider,
   useMenuItemPopover,
 } from "@/components/places/menu-item-popover";
-import { useOrderPopover } from "@/components/layout/order-popover";
+import {
+  PromoPopoverProvider,
+  usePromoPopover,
+  type PromoDetail,
+} from "@/components/places/promo-popover";
+import { OrderStickyBar } from "@/components/layout/order-popover";
+import { PlaceSocialLinks } from "@/components/places/place-social-links";
+import { WishlistDishButton, WishlistPlaceButton } from "@/components/wishlist/wishlist-save-button";
 
 export default function PlaceDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const requireAuth = useRequireAuth();
   const { requestAdd, conflictDialog } = useAddToCartWithConflict();
-  const { openOrderPopover } = useOrderPopover();
-  const itemCount = useCartStore((s) => s.getItemCount());
   const [menuCategory, setMenuCategory] = useState("All");
   const place = getPlaceById(id);
 
@@ -41,40 +47,24 @@ export default function PlaceDetailPage() {
   }
 
   const { isOpen, todayHours } = getOpenStatus(place.hours);
-  const weeklyHours = formatWeeklyHours(place.hours);
   const reviews = place.reviews ?? [];
   const socialLinks = [...(place.sameAs ?? []), ...(place.website ? [place.website] : [])];
-  const socialProfiles = socialLinks.map((url) => {
-    try {
-      const parsed = new URL(url);
-      const host = parsed.hostname.replace("www.", "").toLowerCase();
-      const slug = parsed.pathname.split("/").filter(Boolean)[0] ?? "";
-      const username = slug ? `@${slug}` : host;
-
-      if (host.includes("instagram")) {
-        return { url, platform: "Instagram", icon: "IG", username };
-      }
-      if (host.includes("facebook")) {
-        return { url, platform: "Facebook", icon: "FB", username };
-      }
-      if (host.includes("x.com") || host.includes("twitter")) {
-        return { url, platform: "X", icon: "X", username };
-      }
-      if (host.includes("tiktok")) {
-        return { url, platform: "TikTok", icon: "TT", username };
-      }
-      if (host.includes("youtube")) {
-        return { url, platform: "YouTube", icon: "YT", username };
-      }
-
-      return { url, platform: "Website", icon: "WEB", username: host };
-    } catch {
-      return { url, platform: "Website", icon: "WEB", username: "website" };
-    }
-  });
   const placePromos = HOT_PROMOS.filter((promo) =>
     promo.location.toLowerCase().includes(place.name.toLowerCase()),
   ).slice(0, 2);
+  const getPromoType = (title: string, explicit?: PromoType): PromoType => {
+    if (explicit) return explicit;
+    const normalized = title.toLowerCase();
+    if (normalized.includes("free")) return "Free Item";
+    if (
+      normalized.includes("add-on") ||
+      normalized.includes("addon") ||
+      normalized.includes("extra")
+    ) {
+      return "Add-on";
+    }
+    return "Discount";
+  };
   const getPromoStatus = (title: string): "Active" | "Upcoming" | "Ended" => {
     const normalized = title.toLowerCase();
     if (
@@ -104,6 +94,14 @@ export default function PlaceDetailPage() {
             location: place.name,
             points: place.featured ? 250 : 150,
             image: place.image,
+            type: "Discount" as const,
+            description: `Stack bonus points on your next order at ${place.name}. Valid while this promo is active.`,
+            includedItems: PLACE_MENU_ITEMS.slice(0, 3).map((item) => ({
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              image: item.image,
+            })),
           },
           {
             id: `${place.id}-promo-2`,
@@ -111,6 +109,14 @@ export default function PlaceDetailPage() {
             location: place.location,
             points: 100,
             image: place.image,
+            type: "Add-on" as const,
+            description: `Midweek add-on deals on popular dishes at ${place.name}.`,
+            includedItems: PLACE_MENU_ITEMS.slice(2, 5).map((item) => ({
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              image: item.image,
+            })),
           },
         ];
   const promosWithStatus = activePromos.map((promo) => {
@@ -121,7 +127,12 @@ export default function PlaceDetailPage() {
         : status === "Upcoming"
           ? "bg-hano-white-200"
           : "bg-hano-muted";
-    return { ...promo, status, dotClass };
+    return {
+      ...promo,
+      status,
+      dotClass,
+      promoType: getPromoType(promo.title, promo.type),
+    };
   });
   const staticMenu = place.menu?.flatMap((section) => section.items) ?? [];
   const menuCategories = ["All", ...new Set(PLACE_MENU_ITEMS.map((i) => i.category))];
@@ -156,7 +167,7 @@ export default function PlaceDetailPage() {
   return (
     <PlaceReviewProvider>
       {conflictDialog}
-      <div className="space-y-8">
+      <div className="space-y-8 pb-24">
       <Link
         href="/places"
         className="inline-flex items-center gap-1 text-sm text-hano-muted transition-colors hover:text-hano-green-500"
@@ -165,7 +176,14 @@ export default function PlaceDetailPage() {
         Back to places
       </Link>
       <div className="relative h-56 overflow-hidden rounded-[var(--radius-card)] sm:h-80">
-        <Image src={place.image} alt={place.name} fill className="object-cover" priority />
+        <Image
+          src={place.image}
+          alt={place.name}
+          fill
+          sizes="(max-width: 1024px) 100vw, 896px"
+          className="object-cover"
+          priority
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-hano-green-500/70 via-transparent to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
           <div className="flex flex-wrap items-center gap-2">
@@ -208,11 +226,22 @@ export default function PlaceDetailPage() {
             ))}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href={`/places/${id}/menu`}>
-            <Button size="lg">Order now</Button>
-          </Link>
-          <RateReviewButton place={place} size="lg" />
+        <div className="flex w-full min-w-[min(100%,18rem)] flex-1 items-center justify-between gap-4 self-start sm:min-w-[22rem]">
+          <div className="flex flex-wrap gap-2">
+            <Link href={`/places/${id}/menu`}>
+              <Button size="lg">Order now</Button>
+            </Link>
+            <RateReviewButton place={place} size="lg" />
+          </div>
+          <WishlistPlaceButton
+            placeId={place.id}
+            placeName={place.name}
+            placeImage={place.image}
+            category={place.category}
+            rating={place.rating}
+            size="md"
+            className="shrink-0"
+          />
         </div>
       </div>
 
@@ -221,38 +250,12 @@ export default function PlaceDetailPage() {
           <h2 className="text-lg font-semibold text-hano-green-500">Restaurant Promos</h2>
           <p className="text-sm text-hano-muted">Latest offers added by this restaurant</p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {promosWithStatus.map((promo) => (
-            <article
-              key={promo.id}
-              className="group relative h-80 overflow-hidden rounded-[28px] border border-hano-border"
-            >
-              <Image src={promo.image} alt={promo.title} fill className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-              <div className="absolute inset-0 bg-gradient-to-t from-hano-green-500/85 via-hano-green-500/35 to-transparent" />
-
-              <div className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full bg-black/70 px-3 py-1.5 text-sm text-white backdrop-blur">
-                <span className={`h-2.5 w-2.5 rounded-full ${promo.dotClass}`} />
-                {promo.status}
-              </div>
-
-              <div className="absolute inset-x-4 bottom-4 text-white">
-                <p className="max-w-[90%] text-3xl font-semibold leading-tight tracking-tight">
-                  {promo.title}
-                </p>
-                <p className="mt-3 inline-flex items-center gap-1.5 text-3xl font-semibold">
-                  +{promo.points}
-                  <Icon name="star" size={24} className="text-hano-primary-500" />
-                </p>
-                <div className="mt-5 flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black/45 backdrop-blur">
-                    <Icon name="restaurant" size={20} />
-                  </div>
-                  <p className="text-2xl font-medium leading-tight">{promo.location}</p>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+        <PromoPopoverProvider menuHref={`/places/${id}/menu`}>
+          <PlacePromosGrid
+            promos={promosWithStatus}
+            placeName={place.name}
+          />
+        </PromoPopoverProvider>
       </section>
 
       <section className="rounded-[var(--radius-card)] border border-hano-border bg-white p-5">
@@ -277,8 +280,14 @@ export default function PlaceDetailPage() {
           ))}
         </div>
 
-        <MenuItemPopoverProvider onAddToCart={handleAdd}>
-          <MenuItemsGrid menuItems={menuItems} handleAdd={handleAdd} getCategoryRank={getCategoryRank} />
+        <MenuItemPopoverProvider placeId={id} placeName={place.name} onAddToCart={handleAdd}>
+          <MenuItemsGrid
+            placeId={id}
+            placeName={place.name}
+            menuItems={menuItems}
+            handleAdd={handleAdd}
+            getCategoryRank={getCategoryRank}
+          />
         </MenuItemPopoverProvider>
 
         {staticMenu.length > 0 ? (
@@ -301,16 +310,7 @@ export default function PlaceDetailPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <section>
           <h2 className="mb-3 font-semibold text-hano-green-500">Hours</h2>
-          <Card>
-            <ul className="space-y-2 text-sm">
-              {weeklyHours.map(({ day, hours }) => (
-                <li key={day} className="flex justify-between">
-                  <span className="text-hano-muted">{day}</span>
-                  <span>{hours}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
+          <PlaceWeeklyHours hours={place.hours} />
         </section>
 
         <section>
@@ -344,58 +344,98 @@ export default function PlaceDetailPage() {
         </section>
       </div>
 
-      {socialProfiles.length > 0 ? (
-        <section className="rounded-[var(--radius-card)] border border-hano-border bg-white p-5">
-          <p className="mb-3 text-xs font-semibold tracking-wide text-hano-muted">
-            Stalk us here :)
-          </p>
-          <div className="space-y-2">
-            {socialProfiles.map((profile) => (
-              <a
-                key={profile.url}
-                href={profile.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex cursor-pointer items-center gap-3 rounded-xl border border-hano-border bg-[#fffdfb] px-3 py-2 transition-colors hover:border-(--foundation-primary-primary-200) hover:bg-hano-primary-100"
-              >
-                <span className="inline-flex min-w-10 items-center justify-center rounded-lg border border-hano-border bg-white px-2 py-1 text-[10px] font-semibold text-hano-green-500">
-                  {profile.icon}
-                </span>
-                <div className="min-w-0">
-                  <p className="text-xs font-medium text-hano-green-500">{profile.platform}</p>
-                  <TruncateTooltip className="text-xs text-hano-muted">
-                    {profile.username}
-                  </TruncateTooltip>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      {socialLinks.length > 0 ? <PlaceSocialLinks links={socialLinks} /> : null}
 
-      {itemCount > 0 ? (
-        <div className="sticky bottom-4 flex items-center justify-between gap-4 rounded-full border border-hano-border bg-white px-5 py-3 shadow-lg">
-          <span className="text-sm font-medium">
-            {itemCount} item{itemCount !== 1 ? "s" : ""} in cart
-          </span>
-          <Button
-            size="sm"
-            onClick={(event) => openOrderPopover(event.currentTarget.getBoundingClientRect())}
-          >
-            View orders
-          </Button>
-        </div>
-      ) : null}
+      <OrderStickyBar placeId={id} />
     </div>
     </PlaceReviewProvider>
   );
 }
 
+function PlacePromosGrid({
+  promos,
+  placeName,
+}: {
+  promos: {
+    id: string;
+    title: string;
+    image: string;
+    status: "Active" | "Upcoming" | "Ended";
+    dotClass: string;
+    promoType: PromoType;
+    description?: string;
+    includedItems?: PromoDetail["includedItems"];
+  }[];
+  placeName: string;
+}) {
+  const { openPromo } = usePromoPopover();
+
+  const toDetail = (promo: (typeof promos)[0]): PromoDetail => ({
+    id: promo.id,
+    title: promo.title,
+    description:
+      promo.description ??
+      `Enjoy this ${promo.promoType.toLowerCase()} at ${placeName}.`,
+    image: promo.image,
+    promoType: promo.promoType,
+    status: promo.status,
+    placeName,
+    includedItems:
+      promo.includedItems ??
+      PLACE_MENU_ITEMS.slice(0, 3).map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+      })),
+  });
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {promos.map((promo) => (
+        <article
+          key={promo.id}
+          className="group relative h-80 cursor-pointer overflow-hidden rounded-[28px] border border-hano-border transition-colors hover:border-hano-primary-500"
+          onClick={(event) =>
+            openPromo(toDetail(promo), event.currentTarget.getBoundingClientRect())
+          }
+        >
+          <Image
+            src={promo.image}
+            alt={promo.title}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-hano-green-500/65 via-40% to-hano-green-500/10" />
+
+          <div className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full bg-black/70 px-3 py-1.5 text-sm text-white backdrop-blur">
+            <span className={`h-2.5 w-2.5 rounded-full ${promo.dotClass}`} />
+            {promo.status}
+          </div>
+
+          <div className="absolute inset-x-4 bottom-4 text-white">
+            <span className="inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-medium tracking-wide text-white/95 backdrop-blur">
+              {promo.promoType}
+            </span>
+            <p className="mt-3 max-w-[92%] text-2xl font-normal leading-snug tracking-tight text-white/90">
+              {promo.title}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 function MenuItemsGrid({
+  placeId,
+  placeName,
   menuItems,
   handleAdd,
   getCategoryRank,
 }: {
+  placeId: string;
+  placeName: string;
   menuItems: (typeof PLACE_MENU_ITEMS);
   handleAdd: (item: (typeof PLACE_MENU_ITEMS)[0]) => void;
   getCategoryRank: (item: (typeof PLACE_MENU_ITEMS)[0]) => number;
@@ -405,46 +445,88 @@ function MenuItemsGrid({
   return (
     <div className="grid gap-2.5 sm:auto-rows-fr sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
       {menuItems.map((item) => (
-        <div
+        <MenuItemGridCard
           key={item.id}
-          className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-hano-border p-2.5 transition-colors hover:border-hano-primary-500 hover:bg-hano-primary-50"
-          onClick={(event) =>
-            openMenuItem(
-              { item, categoryRank: getCategoryRank(item) },
-              event.currentTarget.getBoundingClientRect(),
-            )
-          }
-        >
-          <div className="relative aspect-[3/2] w-full shrink-0 overflow-hidden rounded-lg bg-hano-surface">
-            <Image
-              src={item.image}
-              alt={item.name}
-              fill
-              sizes="(max-width: 639px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-            />
-          </div>
-          <div className="flex min-h-0 flex-1 flex-col pt-2">
-            <TruncateTooltip className="text-sm font-medium text-hano-green-500">
-              {item.name}
-            </TruncateTooltip>
-            <TruncateTooltip className="mt-0.5 min-h-6 text-xs text-hano-muted" lines={2}>
-              {item.desc}
-            </TruncateTooltip>
-            <div className="mt-auto flex items-center justify-between gap-1.5 pt-2">
-              <span className="font-semibold">{item.price}</span>
-              <AddToCartButton
-                size="sm"
-                compact
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleAdd(item);
-                }}
-              />
-            </div>
-          </div>
-        </div>
+          placeId={placeId}
+          placeName={placeName}
+          item={item}
+          handleAdd={handleAdd}
+          getCategoryRank={getCategoryRank}
+          onOpen={openMenuItem}
+        />
       ))}
+    </div>
+  );
+}
+
+function MenuItemGridCard({
+  placeId,
+  placeName,
+  item,
+  handleAdd,
+  getCategoryRank,
+  onOpen,
+}: {
+  placeId: string;
+  placeName: string;
+  item: (typeof PLACE_MENU_ITEMS)[0];
+  handleAdd: (item: (typeof PLACE_MENU_ITEMS)[0]) => void;
+  getCategoryRank: (item: (typeof PLACE_MENU_ITEMS)[0]) => number;
+  onOpen: ReturnType<typeof useMenuItemPopover>["openMenuItem"];
+}) {
+  const cartItemId = `${placeId}-${item.id}`;
+  const qty = useCartItemQty(cartItemId);
+  const inCart = qty > 0;
+
+  return (
+    <div
+      className={`group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border p-2.5 transition-colors hover:border-hano-primary-500 hover:bg-hano-primary-50 ${
+        inCart ? "border-hano-primary-500 bg-hano-primary-50/60" : "border-hano-border"
+      }`}
+      onClick={(event) =>
+        onOpen(
+          { item, categoryRank: getCategoryRank(item) },
+          event.currentTarget.getBoundingClientRect(),
+        )
+      }
+    >
+      <div className="relative aspect-[3/2] w-full shrink-0 overflow-hidden rounded-lg bg-hano-surface">
+        <Image
+          src={item.image}
+          alt={item.name}
+          fill
+          sizes="(max-width: 639px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+        />
+        <WishlistDishButton
+          placeId={placeId}
+          placeName={placeName}
+          itemId={item.id}
+          itemName={item.name}
+          itemImage={item.image}
+          itemPrice={item.price}
+          itemPriceRaw={item.priceRaw}
+          overlay
+        />
+        {inCart ? <InCartBadge className="absolute left-1.5 top-1.5" /> : null}
+      </div>
+      <div className="flex min-h-0 flex-1 flex-col pt-2">
+        <TruncateTooltip className="text-sm font-medium text-hano-green-500">
+          {item.name}
+        </TruncateTooltip>
+        <TruncateTooltip className="mt-0.5 min-h-6 text-xs text-hano-muted" lines={2}>
+          {item.desc}
+        </TruncateTooltip>
+        <div className="mt-auto flex items-center justify-between gap-1.5 pt-2">
+          <Price>{item.price}</Price>
+          <CartItemAction
+            cartItemId={cartItemId}
+            size="sm"
+            compact
+            onAdd={() => handleAdd(item)}
+          />
+        </div>
+      </div>
     </div>
   );
 }

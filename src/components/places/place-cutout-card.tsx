@@ -21,6 +21,7 @@ import {
   useCutoutContentStaggerVariants,
 } from "@/components/ui/cutout-card";
 import styles from "@/components/ui/cutout-card.module.css";
+import { WishlistPlaceButton } from "@/components/wishlist/wishlist-save-button";
 
 type PlaceCutoutCardProps = {
   place: PlaceSeed;
@@ -106,11 +107,21 @@ export function PlaceCutoutCard({
             variants={stagger.container}
           >
             <motion.div className={styles.metaRow} variants={stagger.item}>
-              <TruncateTooltip className={styles.metaRowText}>
-                {place.category}
-              </TruncateTooltip>
-              <span aria-hidden="true">·</span>
-              <span className={styles.price}>{place.priceRange}</span>
+              <div className={styles.metaRowMain}>
+                <TruncateTooltip className={styles.metaRowText}>
+                  {place.category}
+                </TruncateTooltip>
+                <span aria-hidden="true">·</span>
+                <span className={styles.price}>{place.priceRange}</span>
+              </div>
+              <WishlistPlaceButton
+                placeId={place.id}
+                placeName={place.name}
+                placeImage={place.image}
+                category={place.category}
+                rating={place.rating}
+                size="sm"
+              />
             </motion.div>
 
             <motion.h2 className={styles.title} variants={stagger.item}>

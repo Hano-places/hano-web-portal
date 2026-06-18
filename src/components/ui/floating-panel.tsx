@@ -58,10 +58,10 @@ function useFloatingPanelLogic() {
   const [isOpen, setIsOpen] = useState(false);
   const [triggerRect, setTriggerRect] = useState<DOMRect | null>(null);
   const [title, setTitle] = useState("");
-  const [placement, setPlacement] = useState<PanelPlacement>("anchored");
+  const [placement, setPlacement] = useState<PanelPlacement>("centered");
 
   const openFloatingPanel = useCallback(
-    (rect: DOMRect | null, panelTitle: string, panelPlacement: PanelPlacement = "anchored") => {
+    (rect: DOMRect | null, panelTitle: string, panelPlacement: PanelPlacement = "centered") => {
       setTriggerRect(rect);
       setTitle(panelTitle);
       setPlacement(panelPlacement);
@@ -288,10 +288,20 @@ export function FloatingPanelContent({
   }, [isOpen]);
 
   const variants: Variants = reduceMotion
-    ? {
-        hidden: { opacity: 0 },
-        visible: { opacity: 1 },
-      }
+    ? placement === "centered"
+      ? {
+          hidden: { opacity: 0, x: "-50%" },
+          visible: { opacity: 1, x: "-50%" },
+        }
+      : placement === "bottom-center"
+        ? {
+            hidden: { opacity: 0, x: "-50%" },
+            visible: { opacity: 1, x: "-50%" },
+          }
+        : {
+            hidden: { opacity: 0 },
+            visible: { opacity: 1 },
+          }
     : placement === "bottom-center"
       ? {
           hidden: { opacity: 0, x: "-50%", y: 28, scale: 0.98 },
@@ -299,8 +309,8 @@ export function FloatingPanelContent({
         }
       : placement === "centered"
         ? {
-            hidden: { opacity: 0, scale: 0.94 },
-            visible: { opacity: 1, scale: 1 },
+            hidden: { opacity: 0, x: "-50%", y: 28, scale: 0.98 },
+            visible: { opacity: 1, x: "-50%", y: 0, scale: 1 },
           }
         : {
             hidden: { opacity: 0, scale: 0.92, y: 12 },
@@ -376,6 +386,20 @@ function FloatingPanelTitle({ children, titleId }: FloatingPanelTitleProps) {
   );
 }
 
+export function FloatingPanelA11yTitle({
+  children,
+  titleId,
+}: {
+  children: ReactNode;
+  titleId: string;
+}) {
+  return (
+    <div id={titleId} className={styles.visuallyHidden}>
+      {children}
+    </div>
+  );
+}
+
 export function FloatingPanelHeader({
   children,
   className,
@@ -383,8 +407,8 @@ export function FloatingPanelHeader({
   return (
     <motion.div
       className={cn(styles.header, className)}
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ delay: 0.08 }}
     >
       {children}
@@ -498,6 +522,7 @@ export const FloatingPanel = {
   Root: FloatingPanelRoot,
   Trigger: FloatingPanelTrigger,
   Content: FloatingPanelContent,
+  A11yTitle: FloatingPanelA11yTitle,
   Header: FloatingPanelHeader,
   Body: FloatingPanelBody,
   Footer: FloatingPanelFooter,

@@ -73,8 +73,10 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-regular: 400;
-  --font-sans: var(--font-nunito);
-  --font-serif: var(--font-nunito);
+  /* --font-instrument-sans / --font-instrument-serif / --font-geist-sans set on <html> via next/font */
+  --font-sans: var(--font-instrument-sans);
+  --font-serif: var(--font-instrument-serif);
+  --font-geist: var(--font-geist-sans);
   --leading-tight: 1.12;
 
   --radius-sm: 8px;
@@ -96,7 +98,8 @@
 @theme inline {
   --color-background: var(--hano-white-500);
   --color-foreground: var(--hano-green-500);
-  --font-sans: var(--font-nunito);
+  --font-sans: var(--font-instrument-sans);
+  --font-geist: var(--font-geist-sans);
 
   --color-hano-primary-50: #faffef;
   --color-hano-primary-100: #eeffce;
@@ -122,7 +125,7 @@
 body {
   background: var(--hano-white-500);
   color: var(--hano-green-500);
-  font-family: var(--font-nunito), system-ui, sans-serif;
+  font-family: var(--font-instrument-sans), system-ui, sans-serif;
 }
 
 ::selection {

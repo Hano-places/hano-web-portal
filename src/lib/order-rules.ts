@@ -1,5 +1,25 @@
+import type { Order } from "@/store/cart";
+
 export const PREP_TIME_MINUTES = 30;
 export const PRE_ORDER_MAX_HOURS = 24;
+
+export type OrderStatusTone = "pending" | "active" | "completed" | "cancelled";
+
+export function getOrderStatusMeta(status: Order["status"]): {
+  label: string;
+  tone: OrderStatusTone;
+} {
+  switch (status) {
+    case "Pending":
+      return { label: "Pending", tone: "pending" };
+    case "Dine-in":
+      return { label: "Dine-in", tone: "active" };
+    case "Served":
+      return { label: "Served", tone: "completed" };
+    case "Cancelled":
+      return { label: "Cancelled", tone: "cancelled" };
+  }
+}
 
 const ACTIVE_STATUSES = new Set(["Pending", "Dine-in"]);
 const PREVIOUS_STATUSES = new Set(["Served", "Cancelled"]);

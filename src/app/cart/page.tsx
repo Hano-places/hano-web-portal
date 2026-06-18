@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useCartStore } from "@/store/cart";
 import { Button } from "@/components/ui/button";
 import { formatRwf } from "@/lib/utils";
+import { useOrderPopover } from "@/components/layout/order-popover";
 
 export default function CartPage() {
-  const router = useRouter();
+  const { openCheckoutPreview } = useOrderPopover();
   const requireAuth = useRequireAuth();
   const {
     items,
@@ -79,7 +79,10 @@ export default function CartPage() {
         <span className="font-semibold">Total</span>
         <span className="text-xl font-bold">{formatRwf(getTotal())}</span>
       </div>
-      <Button className="w-full" onClick={() => router.push("/checkout/preview")}>
+      <Button
+        className="w-full"
+        onClick={(event) => openCheckoutPreview(event.currentTarget.getBoundingClientRect())}
+      >
         Confirm order
       </Button>
     </div>

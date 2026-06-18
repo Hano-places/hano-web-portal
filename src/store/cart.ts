@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { createSafePersistStorage } from "@/lib/safe-persist-storage";
 import {
   getReadyByTime,
   isActiveOrderStatus,
@@ -254,7 +255,7 @@ export const useCartStore = create<CartState>()(
 
       getItemCount: () => get().items.reduce((sum, i) => sum + i.qty, 0),
     }),
-    { name: "@hano/cart" },
+    { name: "@hano/cart", storage: createSafePersistStorage() },
   ),
 );
 

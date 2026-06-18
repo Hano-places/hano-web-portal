@@ -242,11 +242,20 @@
 .metaRow {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  justify-content: space-between;
+  gap: 0.5rem;
   min-width: 0;
   margin-bottom: 0.5rem;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
+}
+
+.metaRowMain {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .metaRowText {
@@ -262,7 +271,9 @@
 
 .price {
   flex-shrink: 0;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
   font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
   color: var(--color-text-secondary);
 }
 
@@ -384,4 +395,28 @@
 
 .contentWithAction {
   padding-bottom: 3.5rem;
+}
+
+@media (max-width: 640px) {
+  .media {
+    height: 12rem;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .title {
+    margin-bottom: 0.35rem;
+    font-size: var(--text-lg);
+  }
+
+  .description {
+    margin-bottom: 0.55rem;
+  }
+
+  .actionPos {
+    right: 0.85rem;
+    bottom: 0.85rem;
+  }
 }

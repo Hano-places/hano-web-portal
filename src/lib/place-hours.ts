@@ -151,9 +151,41 @@ export function getOpenStatus(hours: WeeklyHours): {
   };
 }
 
-export function formatWeeklyHours(hours: WeeklyHours): { day: string; hours: string }[] {
-  return DAY_ORDER.slice(1).concat(DAY_ORDER[0]).map((day) => ({
-    day: DAY_LABELS[day],
-    hours: hours[day],
-  }));
+export type WeeklyHoursEntry = {
+  day: string;
+  dayKey: DayOfWeek;
+  hours: string;
+  segments: string[];
+  isToday: boolean;
+  isClosed: boolean;
+};
+
+function isClosedHoursLabel(label: string): boolean {
+  return !label || label.trim().toLowerCase() === "closed";
+}
+
+function splitHoursSegments(label: string): string[] {
+  return label
+    .split(",")
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+}
+
+export function formatWeeklyHours(hours: WeeklyHours): WeeklyHoursEntry[] {
+  const today = getKigaliDay();
+
+  return DAY_ORDER.slice(1)
+    .concat(DAY_ORDER[0])
+    .map((dayKey) => {
+      const hoursLabel = hours[dayKey];
+
+      return {
+        day: DAY_LABELS[dayKey],
+        dayKey,
+        hours: hoursLabel,
+        segments: splitHoursSegments(hoursLabel),
+        isToday: dayKey === today,
+        isClosed: isClosedHoursLabel(hoursLabel),
+      };
+    });
 }

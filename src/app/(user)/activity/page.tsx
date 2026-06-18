@@ -3,12 +3,16 @@
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
 import { WALLET_ACTIVITIES } from "@/lib/data/mock-data";
+import { formatRwf } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
+import { OrderStatusBadge } from "@/components/orders/order-status-badge";
+import { useOrderPopover } from "@/components/layout/order-popover";
 import { useAuthStore } from "@/store/auth";
 
 export default function ActivityPage() {
   const user = useAuthStore((s) => s.user);
   const orders = useCartStore((s) => s.orders);
+  const { openOrderDetail } = useOrderPopover();
 
   return (
     <div className="space-y-6">
@@ -42,18 +46,37 @@ export default function ActivityPage() {
 
       {orders.length > 0 && (
         <section>
-          <h2 className="mb-3 font-semibold">Recent Orders</h2>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="font-semibold">Recent Orders</h2>
+            <Link href="/orders" className="text-sm text-hano-green-500 underline underline-offset-2">
+              View all
+            </Link>
+          </div>
           <div className="space-y-2">
-            {orders.map((order) => (
-              <Link key={order.id} href={`/orders/${order.id}`} className="block cursor-pointer">
-                <Card interactive className="flex items-center justify-between py-3">
-                  <div>
-                    <p className="text-sm font-medium">Order #{order.id.slice(0, 8)}</p>
-                    <p className="text-xs text-hano-muted">{order.placeName}</p>
+            {orders.slice(0, 5).map((order) => (
+              <button
+                key={order.id}
+                type="button"
+                className="block w-full cursor-pointer text-left"
+                onClick={(event) =>
+                  openOrderDetail(order.id, event.currentTarget.getBoundingClientRect(), {
+                    returnTo: "close",
+                  })
+                }
+              >
+                <Card interactive className="flex items-center justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">{order.placeName}</p>
+                    <p className="text-xs text-hano-muted">
+                      {order.items.length} items · {formatRwf(order.total)}
+                    </p>
                   </div>
-                  <span className="text-sm text-hano-muted">View</span>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <OrderStatusBadge status={order.status} />
+                    <span className="text-xs text-hano-muted">View</span>
+                  </div>
                 </Card>
-              </Link>
+              </button>
             ))}
           </div>
         </section>

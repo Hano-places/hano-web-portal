@@ -12,7 +12,7 @@ import {
 } from "react";
 import type { MenuItem } from "@/lib/data/mock-data";
 import { Icon } from "@/components/ui/icon";
-import { AddToCartButton } from "@/components/places/add-to-cart-button";
+import { CartItemAction } from "@/components/places/cart-item-action";
 import {
   CutoutCardImage,
   CutoutCardInsetLabel,
@@ -32,6 +32,7 @@ import {
   useFloatingPanel,
 } from "@/components/ui/floating-panel";
 import panelStyles from "@/components/ui/floating-panel.module.css";
+import { WishlistDishButton } from "@/components/wishlist/wishlist-save-button";
 import styles from "./menu-item-popover.module.css";
 
 type MenuItemPayload = {
@@ -55,9 +56,13 @@ export function useMenuItemPopover() {
 
 function MenuItemPanel({
   payload,
+  placeId,
+  placeName,
   onAddToCart,
 }: {
   payload: MenuItemPayload;
+  placeId: string;
+  placeName: string;
   onAddToCart?: (item: MenuItem) => void;
 }) {
   const titleId = useId();
@@ -156,10 +161,27 @@ function MenuItemPanel({
             </div>
           ) : null}
         </FloatingPanelBody>
-        <FloatingPanelFooter>
+        <FloatingPanelFooter className={styles.footer}>
           <span className={styles.price}>{payload.item.price}</span>
-          <AddToCartButton onClick={() => onAddToCart?.(payload.item)} />
-          <FloatingPanelCloseButton />
+          <div className={styles.footerActions}>
+            <WishlistDishButton
+              placeId={placeId}
+              placeName={placeName}
+              itemId={payload.item.id}
+              itemName={payload.item.name}
+              itemImage={payload.item.image}
+              itemPrice={payload.item.price}
+              itemPriceRaw={payload.item.priceRaw}
+              size="md"
+            />
+            <CartItemAction
+              cartItemId={`${placeId}-${payload.item.id}`}
+              size="md"
+              compact={false}
+              onAdd={() => onAddToCart?.(payload.item)}
+            />
+            <FloatingPanelCloseButton />
+          </div>
         </FloatingPanelFooter>
       </div>
     </FloatingPanelContent>
@@ -168,9 +190,13 @@ function MenuItemPanel({
 
 function MenuItemPopoverInner({
   children,
+  placeId,
+  placeName,
   onAddToCart,
 }: {
   children: ReactNode;
+  placeId: string;
+  placeName: string;
   onAddToCart?: (item: MenuItem) => void;
 }) {
   const [selected, setSelected] = useState<MenuItemPayload | null>(null);
@@ -179,7 +205,7 @@ function MenuItemPopoverInner({
   const openMenuItem = useCallback(
     (payload: MenuItemPayload, rect: DOMRect | null) => {
       setSelected(payload);
-      openFloatingPanel(rect, payload.item.name, "anchored");
+      openFloatingPanel(rect, payload.item.name, "centered");
     },
     [openFloatingPanel],
   );
@@ -196,21 +222,34 @@ function MenuItemPopoverInner({
   return (
     <MenuItemPopoverContext.Provider value={value}>
       {children}
-      {selected ? <MenuItemPanel payload={selected} onAddToCart={onAddToCart} /> : null}
+      {selected ? (
+        <MenuItemPanel
+          payload={selected}
+          placeId={placeId}
+          placeName={placeName}
+          onAddToCart={onAddToCart}
+        />
+      ) : null}
     </MenuItemPopoverContext.Provider>
   );
 }
 
 export function MenuItemPopoverProvider({
   children,
+  placeId,
+  placeName,
   onAddToCart,
 }: {
   children: ReactNode;
+  placeId: string;
+  placeName: string;
   onAddToCart?: (item: MenuItem) => void;
 }) {
   return (
     <FloatingPanelRoot>
-      <MenuItemPopoverInner onAddToCart={onAddToCart}>{children}</MenuItemPopoverInner>
+      <MenuItemPopoverInner placeId={placeId} placeName={placeName} onAddToCart={onAddToCart}>
+        {children}
+      </MenuItemPopoverInner>
     </FloatingPanelRoot>
   );
 }

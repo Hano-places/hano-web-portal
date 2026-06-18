@@ -21,15 +21,15 @@ export default function PublicHomePage() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl bg-hano-primary-100 p-8">
+      <section className="rounded-2xl bg-hano-primary-100 p-8 text-center md:text-left">
         <h1 className="text-3xl font-bold text-hano-green-500">
           Discover Kigali&apos;s best places
         </h1>
-        <p className="mt-2 max-w-xl text-hano-green-300">
+        <p className="mx-auto mt-2 max-w-xl text-hano-green-300 md:mx-0">
           Browse restaurants, cafés, and lounges. No account needed to explore — sign in when
           you&apos;re ready to order or share moments.
         </p>
-        <div className="mt-6 flex gap-3">
+        <div className="mt-6 flex flex-wrap justify-center gap-3 md:justify-start">
           <Link href="/places">
             <Button>Explore places</Button>
           </Link>
@@ -75,7 +75,12 @@ export default function PublicHomePage() {
       {tab === "places" && (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((place) => (
-            <PlaceCard key={place.id} place={place} />
+            <div
+              key={place.id}
+              className="mx-auto w-full max-w-[min(22rem,calc(100vw-2rem))] sm:max-w-none"
+            >
+              <PlaceCard place={place} />
+            </div>
           ))}
         </div>
       )}

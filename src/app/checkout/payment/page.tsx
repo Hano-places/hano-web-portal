@@ -1,9 +1,18 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useCartStore } from "@/store/cart";
 import { PAYMENT_METHODS } from "@/lib/data/mock-data";
+import {
+  formatCardCvv,
+  formatCardExpiry,
+  formatCardNumber,
+  formatRwandaPhone,
+  isCardPaymentValid,
+  isValidRwandaPhone,
+} from "@/lib/payment-input";
 import {
   formatOrderDateTime,
   getReadyByTime,
@@ -22,15 +31,22 @@ function PaymentForm() {
   const { getTotal, placeOrder } = useCartStore();
   const [method, setMethod] = useState("momo");
   const [phone, setPhone] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
 
-  const readyBy =
-    orderType === "direct" ? formatOrderDateTime(getReadyByTime()) : undefined;
   const pickupLabel =
     orderType === "pre-order" && pickupTime
       ? formatOrderDateTime(pickupTime)
       : undefined;
 
+  const canPay =
+    method === "card"
+      ? isCardPaymentValid({ cardNumber, cardExpiry, cardCvv })
+      : isValidRwandaPhone(phone);
+
   const handlePay = () => {
+    if (!canPay) return;
     placeOrder(orderType, pickupTime);
     const params = new URLSearchParams({ type: orderType });
     if (pickupTime) params.set("pickup", pickupTime);
@@ -45,7 +61,7 @@ function PaymentForm() {
 
       {orderType === "direct" ? (
         <p className="rounded-xl border border-hano-border bg-hano-primary-50 px-4 py-3 text-sm text-hano-green-500">
-          Direct order · ready by <strong>{readyBy}</strong> ({PREP_TIME_MINUTES} min prep).
+          Direct order · estimated prep time: <strong>{PREP_TIME_MINUTES} minutes</strong>
         </p>
       ) : (
         <p className="rounded-xl border border-hano-border bg-hano-primary-50 px-4 py-3 text-sm text-hano-green-500">
@@ -60,10 +76,10 @@ function PaymentForm() {
             type="button"
             onClick={() => setMethod(m.id)}
             className={`flex w-full cursor-pointer items-center gap-3 rounded-xl border p-4 text-left ${
-              method === m.id ? "border-hano-primary-500 bg-hano-primary-50" : ""
+              method === m.id ? "border-hano-green-500 bg-hano-green-500/5" : ""
             }`}
           >
-            <span>{m.icon}</span>
+            <Image src={m.logo} alt="" width={32} height={32} className="h-8 w-8 rounded-md object-cover" />
             <span className="font-medium">{m.name}</span>
           </button>
         ))}
@@ -73,21 +89,45 @@ function PaymentForm() {
         <Input
           placeholder="Phone number (7XXXXXXXX)"
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={(e) => setPhone(formatRwandaPhone(e.target.value))}
+          inputMode="numeric"
+          autoComplete="tel"
+          maxLength={10}
         />
       )}
 
       {method === "card" && (
         <div className="space-y-3">
-          <Input placeholder="Card number" />
+          <Input
+            placeholder="Card number"
+            value={cardNumber}
+            onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+            inputMode="numeric"
+            autoComplete="cc-number"
+            maxLength={19}
+          />
           <div className="grid grid-cols-2 gap-3">
-            <Input placeholder="MM/YY" />
-            <Input placeholder="CVV" />
+            <Input
+              placeholder="MM/YY"
+              value={cardExpiry}
+              onChange={(e) => setCardExpiry(formatCardExpiry(e.target.value))}
+              inputMode="numeric"
+              autoComplete="cc-exp"
+              maxLength={5}
+            />
+            <Input
+              placeholder="CVV"
+              value={cardCvv}
+              onChange={(e) => setCardCvv(formatCardCvv(e.target.value))}
+              inputMode="numeric"
+              autoComplete="cc-csc"
+              maxLength={4}
+            />
           </div>
         </div>
       )}
 
-      <Button className="w-full" onClick={handlePay}>
+      <Button className="w-full" onClick={handlePay} disabled={!canPay}>
         Pay {formatRwf(getTotal())}
       </Button>
       <p className="text-center text-xs text-hano-muted">

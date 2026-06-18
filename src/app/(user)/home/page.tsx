@@ -2,11 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { getFeaturedPlaceSeeds } from "@/lib/places-data";
 import { PlaceCard } from "@/components/places/place-card";
+import { SavedPlacesHero } from "@/components/home/saved-places-hero";
 import { HOT_PROMOS, TOP_DISHES } from "@/lib/data/mock-data";
 import { HOME_KPIS, MOMENTS_FEED } from "@/lib/data/feed-data";
+import { useCartStore } from "@/store/cart";
+import { useWishlistStore } from "@/store/wishlist";
 import { PeriodPill } from "@/components/ui/period-pill";
 import { Card } from "@/components/ui/card";
 import { FilterChip } from "@/components/ui/filter-chip";
@@ -17,6 +20,26 @@ export default function HomePage() {
   const [period, setPeriod] = useState("Today");
   const [tab, setTab] = useState<"dishes" | "places" | "moments">("places");
   const featured = getFeaturedPlaceSeeds();
+  const orderCount = useCartStore((s) => s.orders.length);
+  const savedPlaceCount = useWishlistStore((s) => s.places.length);
+
+  const kpis = useMemo(
+    () =>
+      HOME_KPIS.map((kpi) => {
+        if (kpi.label === "Orders placed") {
+          return { ...kpi, value: String(orderCount), change: orderCount > 0 ? kpi.change : undefined };
+        }
+        if (kpi.label === "Places saved") {
+          return {
+            ...kpi,
+            value: String(savedPlaceCount),
+            change: savedPlaceCount > 0 ? kpi.change : undefined,
+          };
+        }
+        return kpi;
+      }),
+    [orderCount, savedPlaceCount],
+  );
 
   return (
     <div className="space-y-8">
@@ -28,6 +51,8 @@ export default function HomePage() {
         </p>
       </div>
 
+      <SavedPlacesHero />
+
       <div className="flex flex-wrap gap-2">
         {PERIODS.map((p) => (
           <PeriodPill key={p} label={p} active={period === p} onClick={() => setPeriod(p)} />
@@ -35,7 +60,7 @@ export default function HomePage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        {HOME_KPIS.map((kpi) => (
+        {kpis.map((kpi) => (
           <Card key={kpi.label}>
             <p className="text-sm text-hano-muted">{kpi.label}</p>
             <p className="mt-1 text-2xl font-bold">{kpi.value}</p>
