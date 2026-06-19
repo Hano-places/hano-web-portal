@@ -118,8 +118,8 @@ function PlaceReviewPanel({ place }: { place: PlaceSeed }) {
 
   return (
     <FloatingPanelContent header={<PlaceReviewHero place={place} />} titleId={titleId}>
-      <div className={panelStyles.panelScroll}>
-        <div className={styles.titleBlock}>
+      <div className={panelStyles.panelLayout}>
+        <div className={`${panelStyles.panelTitleBlock} ${styles.titleBlock}`}>
           <h2 className={styles.placeName} id={titleId}>
             Rate & Review
           </h2>
@@ -128,10 +128,13 @@ function PlaceReviewPanel({ place }: { place: PlaceSeed }) {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <FloatingPanelHeader>Your rating</FloatingPanelHeader>
+        <form onSubmit={handleSubmit} className={`${panelStyles.panelLayout} min-h-0 flex-1`}>
+          <FloatingPanelHeader className={panelStyles.panelHeaderFixed}>
+            Your rating
+          </FloatingPanelHeader>
 
-          <FloatingPanelBody>
+          <div className={panelStyles.panelBodyScroll}>
+            <FloatingPanelBody>
             <div className={styles.stars} role="radiogroup" aria-label="Star rating">
               {Array.from({ length: 5 }).map((_, index) => {
                 const value = index + 1;
@@ -165,9 +168,10 @@ function PlaceReviewPanel({ place }: { place: PlaceSeed }) {
             {submitted ? (
               <p className={styles.success}>Thanks — your review was submitted.</p>
             ) : null}
-          </FloatingPanelBody>
+            </FloatingPanelBody>
+          </div>
 
-          <FloatingPanelFooter>
+          <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
             <Button
               type="submit"
               className={styles.submitButton}

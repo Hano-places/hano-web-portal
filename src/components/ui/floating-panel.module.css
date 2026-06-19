@@ -99,6 +99,23 @@
   flex-shrink: 0;
 }
 
+.panelHeaderFixed {
+  flex-shrink: 0;
+  padding-bottom: 0.75rem !important;
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.panelTitleBlock {
+  flex-shrink: 0;
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.panelBodyScroll .body {
+  flex: none;
+}
+
 .panelTitleWrap {
   flex-shrink: 0;
   padding: 1rem 1.25rem 0.75rem;

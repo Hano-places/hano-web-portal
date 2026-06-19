@@ -33,25 +33,20 @@ interface WishlistState {
   dishes: WishlistDish[];
   togglePlace: (place: WishlistPlaceInput) => void;
   toggleDish: (dish: WishlistDishInput) => void;
-  togglePinPlace: (placeId: string) => void;
-  togglePinDish: (id: string) => void;
   removePlace: (placeId: string) => void;
   removeDish: (id: string) => void;
   isPlaceSaved: (placeId: string) => boolean;
   isDishSaved: (placeId: string, itemId: string) => boolean;
   getDishId: (placeId: string, itemId: string) => string;
   getTotalCount: () => number;
-  getPinnedPlaces: () => WishlistPlace[];
-  getPinnedDishes: () => WishlistDish[];
   getSavedPlaces: () => WishlistPlace[];
   getSavedDishes: () => WishlistDish[];
 }
 
-function sortWishlist<T extends { pinned: boolean; savedAt: string }>(items: T[]) {
-  return [...items].sort((a, b) => {
-    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
-    return new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime();
-  });
+function sortWishlist<T extends { savedAt: string }>(items: T[]) {
+  return [...items].sort(
+    (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(),
+  );
 }
 
 export { sortWishlist };
@@ -76,7 +71,7 @@ export const useWishlistStore = create<WishlistState>()(
           places: [
             {
               ...place,
-              pinned: true,
+              pinned: false,
               savedAt: new Date().toISOString(),
             },
             ...get().places,
@@ -98,27 +93,11 @@ export const useWishlistStore = create<WishlistState>()(
             {
               ...dish,
               id,
-              pinned: true,
+              pinned: false,
               savedAt: new Date().toISOString(),
             },
             ...get().dishes,
           ],
-        });
-      },
-
-      togglePinPlace: (placeId) => {
-        set({
-          places: get().places.map((item) =>
-            item.placeId === placeId ? { ...item, pinned: !item.pinned } : item,
-          ),
-        });
-      },
-
-      togglePinDish: (id) => {
-        set({
-          dishes: get().dishes.map((item) =>
-            item.id === id ? { ...item, pinned: !item.pinned } : item,
-          ),
         });
       },
 
@@ -136,10 +115,6 @@ export const useWishlistStore = create<WishlistState>()(
         get().dishes.some((item) => item.id === get().getDishId(placeId, itemId)),
 
       getTotalCount: () => get().places.length + get().dishes.length,
-
-      getPinnedPlaces: () => sortWishlist(get().places.filter((item) => item.pinned)),
-
-      getPinnedDishes: () => sortWishlist(get().dishes.filter((item) => item.pinned)),
 
       getSavedPlaces: () => sortWishlist(get().places),
 

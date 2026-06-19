@@ -75,7 +75,7 @@ export function SavedPlacesHero() {
             <h2 className="text-lg font-semibold text-hano-green-500">Saved places</h2>
           </div>
           <p className="mt-1 text-sm text-hano-muted">
-            Your favorites, pinned and ready to order again
+            Your favorites, ready to order again
           </p>
         </div>
         <div className="flex items-center gap-2">

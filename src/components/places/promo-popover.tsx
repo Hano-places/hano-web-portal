@@ -120,14 +120,14 @@ function PromoPanel({
       titleId={titleId}
     >
       <div className={panelStyles.panelLayout}>
-        <div className={panelStyles.panelBodyScroll}>
-          <div className={styles.titleBlock}>
-            <h2 id={titleId} className={styles.promoTitle}>
-              {promo.title}
-            </h2>
-            <p className={styles.promoSub}>{promo.placeName}</p>
-          </div>
+        <div className={`${panelStyles.panelTitleBlock} ${styles.titleBlock}`}>
+          <h2 id={titleId} className={styles.promoTitle}>
+            {promo.title}
+          </h2>
+          <p className={styles.promoSub}>{promo.placeName}</p>
+        </div>
 
+        <div className={panelStyles.panelBodyScroll}>
           <FloatingPanelHeader>Promo details</FloatingPanelHeader>
           <FloatingPanelBody className="space-y-3">
             <div className={styles.metaChips}>
