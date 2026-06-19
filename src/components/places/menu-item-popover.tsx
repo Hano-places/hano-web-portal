@@ -130,23 +130,23 @@ function MenuItemPanel({
       titleId={titleId}
     >
       <div className={panelStyles.panelLayout}>
+        <div className={`${panelStyles.panelTitleBlock} ${styles.titleBlock}`}>
+          <h2 id={titleId} className={styles.itemName}>
+            {payload.item.name}
+          </h2>
+          <WishlistDishButton
+            placeId={placeId}
+            placeName={placeName}
+            itemId={payload.item.id}
+            itemName={payload.item.name}
+            itemImage={payload.item.image}
+            itemPrice={payload.item.price}
+            itemPriceRaw={payload.item.priceRaw}
+            size="md"
+            className={styles.titleWishlistButton}
+          />
+        </div>
         <div className={panelStyles.panelBodyScroll}>
-          <div className={styles.titleBlock}>
-            <h2 id={titleId} className={styles.itemName}>
-              {payload.item.name}
-            </h2>
-            <WishlistDishButton
-              placeId={placeId}
-              placeName={placeName}
-              itemId={payload.item.id}
-              itemName={payload.item.name}
-              itemImage={payload.item.image}
-              itemPrice={payload.item.price}
-              itemPriceRaw={payload.item.priceRaw}
-              size="md"
-              className={styles.titleWishlistButton}
-            />
-          </div>
           <FloatingPanelHeader>Item details</FloatingPanelHeader>
           <FloatingPanelBody className="space-y-3">
             <div className={styles.metaChips}>

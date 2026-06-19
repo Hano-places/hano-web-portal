@@ -70,9 +70,12 @@ function LoginModalPanel() {
       titleId={titleId}
       header={<FloatingPanelA11yTitle titleId={titleId}>Sign in to continue</FloatingPanelA11yTitle>}
     >
-      <div className={panelStyles.panelScroll}>
-        <FloatingPanelHeader>Sign in to continue</FloatingPanelHeader>
-        <FloatingPanelBody className="space-y-4">
+      <div className={panelStyles.panelLayout}>
+        <FloatingPanelHeader className={panelStyles.panelHeaderFixed}>
+          Sign in to continue
+        </FloatingPanelHeader>
+        <div className={panelStyles.panelBodyScroll}>
+          <FloatingPanelBody className="space-y-4">
           <p className="text-sm text-hano-muted">
             Create an account or log in to {actionMessage}.
           </p>
@@ -87,7 +90,8 @@ function LoginModalPanel() {
             </Link>
           </div>
         </FloatingPanelBody>
-        <FloatingPanelFooter>
+        </div>
+        <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
           <FloatingPanelCloseButton />
         </FloatingPanelFooter>
       </div>

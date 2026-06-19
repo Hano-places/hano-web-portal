@@ -235,55 +235,58 @@ function OrderPanel({
       titleId={titleId}
       header={<FloatingPanelA11yTitle titleId={titleId}>Your orders</FloatingPanelA11yTitle>}
     >
-      <div className={panelStyles.panelScroll}>
-        <FloatingPanelHeader>Your orders</FloatingPanelHeader>
+      <div className={panelStyles.panelLayout}>
+        <FloatingPanelHeader className={panelStyles.panelHeaderFixed}>
+          Your orders
+        </FloatingPanelHeader>
+        <div className={panelStyles.panelBodyScroll}>
+          <FloatingPanelBody className={styles.sectionStack}>
+            <CurrentDraftSection onPlaceOrder={handlePlaceOrder} />
 
-        <FloatingPanelBody className={styles.sectionStack}>
-          <CurrentDraftSection onPlaceOrder={handlePlaceOrder} />
-
-          {drafts.length > 0 ? (
-            <section className={styles.sectionBlock}>
-              <p className={styles.sectionTitle}>Saved drafts</p>
-              <div className={styles.sectionStack}>
-                {drafts.map((draft) => (
-                  <div key={draft.placeId} className={styles.draftRow}>
-                    <div className="flex min-w-0 items-center gap-2">
-                      {draft.placeImage ? (
-                        <Image
-                          src={draft.placeImage}
-                          alt=""
-                          width={36}
-                          height={36}
-                          className={styles.placeImage}
-                        />
-                      ) : null}
-                      <div className="min-w-0">
-                        <p className={styles.orderTitle}>{draft.placeName}</p>
-                        <p className={styles.orderSub}>
-                          {draft.items.length} items · saved {formatRelativeTime(draft.updatedAt)}
-                        </p>
+            {drafts.length > 0 ? (
+              <section className={styles.sectionBlock}>
+                <p className={styles.sectionTitle}>Saved drafts</p>
+                <div className={styles.sectionStack}>
+                  {drafts.map((draft) => (
+                    <div key={draft.placeId} className={styles.draftRow}>
+                      <div className="flex min-w-0 items-center gap-2">
+                        {draft.placeImage ? (
+                          <Image
+                            src={draft.placeImage}
+                            alt=""
+                            width={36}
+                            height={36}
+                            className={styles.placeImage}
+                          />
+                        ) : null}
+                        <div className="min-w-0">
+                          <p className={styles.orderTitle}>{draft.placeName}</p>
+                          <p className={styles.orderSub}>
+                            {draft.items.length} items · saved {formatRelativeTime(draft.updatedAt)}
+                          </p>
+                        </div>
                       </div>
+                      <Button size="sm" variant="outline" onClick={() => loadDraft(draft.placeId)}>
+                        Resume
+                      </Button>
                     </div>
-                    <Button size="sm" variant="outline" onClick={() => loadDraft(draft.placeId)}>
-                      Resume
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ) : null}
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
-          <OrderList
-            activeOrders={activeOrders}
-            previousOrders={previousOrders}
-            onOrderClick={onOrderClick}
-            onReorder={onReorder}
-            onClearPrevious={clearPreviousOrders}
-            variant="popover"
-          />
-        </FloatingPanelBody>
+            <OrderList
+              activeOrders={activeOrders}
+              previousOrders={previousOrders}
+              onOrderClick={onOrderClick}
+              onReorder={onReorder}
+              onClearPrevious={clearPreviousOrders}
+              variant="popover"
+            />
+          </FloatingPanelBody>
+        </div>
 
-        <FloatingPanelFooter>
+        <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
           <Link href="/orders" className={styles.footerLink} onClick={closeFloatingPanel}>
             View full orders
           </Link>
@@ -327,62 +330,66 @@ function CheckoutPreviewPanel({
       titleId={titleId}
       header={<FloatingPanelA11yTitle titleId={titleId}>Order preview</FloatingPanelA11yTitle>}
     >
-      <div className={panelStyles.panelScroll}>
-        <FloatingPanelHeader>Order preview</FloatingPanelHeader>
-        <FloatingPanelBody className="space-y-3">
-          <div className={styles.placeHeader}>
-            {currentPlaceImage ? (
-              <Image
-                src={currentPlaceImage}
-                alt=""
-                width={44}
-                height={44}
-                className={styles.placeImage}
-              />
+      <div className={panelStyles.panelLayout}>
+        <FloatingPanelHeader className={panelStyles.panelHeaderFixed}>
+          Order preview
+        </FloatingPanelHeader>
+        <div className={panelStyles.panelBodyScroll}>
+          <FloatingPanelBody className="space-y-3">
+            <div className={styles.placeHeader}>
+              {currentPlaceImage ? (
+                <Image
+                  src={currentPlaceImage}
+                  alt=""
+                  width={44}
+                  height={44}
+                  className={styles.placeImage}
+                />
+              ) : null}
+              <div>
+                <p className={styles.placeName}>{currentPlaceName}</p>
+                <p className={styles.placeSub}>Single-place order</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {items.map((item) => (
+                <div key={item.id} className="flex items-center justify-between gap-3 text-sm">
+                  <span className="min-w-0 truncate">
+                    {item.qty}x {item.name}
+                  </span>
+                  <Price>{formatRwf(item.priceRaw * item.qty)}</Price>
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.totalRow}>
+              <span>Total</span>
+              <Price>{formatRwf(getTotal())}</Price>
+            </div>
+
+            {confirmDiscard ? (
+              <div className="rounded-xl border border-hano-danger-500/30 bg-red-50 px-3 py-2">
+                <p className="text-sm font-medium text-hano-green-500">
+                  Discard this order draft?
+                </p>
+                <p className="mt-0.5 text-xs text-hano-muted">
+                  This will remove all items currently in your cart.
+                </p>
+                <div className="mt-2 flex flex-wrap justify-end gap-2">
+                  <Button size="sm" variant="ghost" onClick={() => setConfirmDiscard(false)}>
+                    Keep editing
+                  </Button>
+                  <Button size="sm" variant="danger" onClick={handleDiscard}>
+                    Yes, discard
+                  </Button>
+                </div>
+              </div>
             ) : null}
-            <div>
-              <p className={styles.placeName}>{currentPlaceName}</p>
-              <p className={styles.placeSub}>Single-place order</p>
-            </div>
-          </div>
+          </FloatingPanelBody>
+        </div>
 
-          <div className="space-y-2">
-            {items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between gap-3 text-sm">
-                <span className="min-w-0 truncate">
-                  {item.qty}x {item.name}
-                </span>
-                <Price>{formatRwf(item.priceRaw * item.qty)}</Price>
-              </div>
-            ))}
-          </div>
-
-          <div className={styles.totalRow}>
-            <span>Total</span>
-            <Price>{formatRwf(getTotal())}</Price>
-          </div>
-
-          {confirmDiscard ? (
-            <div className="rounded-xl border border-hano-danger-500/30 bg-red-50 px-3 py-2">
-              <p className="text-sm font-medium text-hano-green-500">
-                Discard this order draft?
-              </p>
-              <p className="mt-0.5 text-xs text-hano-muted">
-                This will remove all items currently in your cart.
-              </p>
-              <div className="mt-2 flex flex-wrap justify-end gap-2">
-                <Button size="sm" variant="ghost" onClick={() => setConfirmDiscard(false)}>
-                  Keep editing
-                </Button>
-                <Button size="sm" variant="danger" onClick={handleDiscard}>
-                  Yes, discard
-                </Button>
-              </div>
-            </div>
-          ) : null}
-        </FloatingPanelBody>
-
-        <FloatingPanelFooter>
+        <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
           <Button variant="ghost" onClick={() => setConfirmDiscard(true)}>
             Cancel
           </Button>
@@ -423,28 +430,32 @@ function OrderTypePanel({
       titleId={titleId}
       header={<FloatingPanelA11yTitle titleId={titleId}>Order type</FloatingPanelA11yTitle>}
     >
-      <div className={panelStyles.panelScroll}>
-        <FloatingPanelHeader>How would you like to order?</FloatingPanelHeader>
-        <FloatingPanelBody className="space-y-3">
-          <button type="button" className={styles.optionCard} onClick={onDirect}>
-            <div>
-              <p className={styles.optionTitle}>Direct order</p>
-              <p className={styles.optionDesc}>
-                We&apos;ll start preparing now. Estimated ready by {readyBy} ({PREP_TIME_MINUTES}{" "}
-                min prep).
-              </p>
-            </div>
-          </button>
-          <button type="button" className={styles.optionCard} onClick={onPreOrder}>
-            <div>
-              <p className={styles.optionTitle}>Pre-order</p>
-              <p className={styles.optionDesc}>
-                Pick a time at least {PREP_TIME_MINUTES} minutes from now and within 24 hours.
-              </p>
-            </div>
-          </button>
-        </FloatingPanelBody>
-        <FloatingPanelFooter>
+      <div className={panelStyles.panelLayout}>
+        <FloatingPanelHeader className={panelStyles.panelHeaderFixed}>
+          How would you like to order?
+        </FloatingPanelHeader>
+        <div className={panelStyles.panelBodyScroll}>
+          <FloatingPanelBody className="space-y-3">
+            <button type="button" className={styles.optionCard} onClick={onDirect}>
+              <div>
+                <p className={styles.optionTitle}>Direct order</p>
+                <p className={styles.optionDesc}>
+                  We&apos;ll start preparing now. Estimated ready by {readyBy} ({PREP_TIME_MINUTES}{" "}
+                  min prep).
+                </p>
+              </div>
+            </button>
+            <button type="button" className={styles.optionCard} onClick={onPreOrder}>
+              <div>
+                <p className={styles.optionTitle}>Pre-order</p>
+                <p className={styles.optionDesc}>
+                  Pick a time at least {PREP_TIME_MINUTES} minutes from now and within 24 hours.
+                </p>
+              </div>
+            </button>
+          </FloatingPanelBody>
+        </div>
+        <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
           <button
             type="button"
             className={panelStyles.closeButton}
@@ -477,26 +488,30 @@ function PickupTimePanel({
       titleId={titleId}
       header={<FloatingPanelA11yTitle titleId={titleId}>Pickup time</FloatingPanelA11yTitle>}
     >
-      <div className={panelStyles.panelScroll}>
-        <FloatingPanelHeader>Pickup time</FloatingPanelHeader>
-        <FloatingPanelBody className="space-y-3">
-          <p className="text-sm text-hano-muted">
-            Choose when you want to pick up. Must be at least {PREP_TIME_MINUTES} minutes from now
-            and within 24 hours.
-          </p>
-          <input
-            type="datetime-local"
-            value={value}
-            min={minValue}
-            max={maxValue}
-            onChange={(event) => setValue(event.target.value)}
-            className="h-11 w-full rounded-xl border border-hano-border bg-white px-4 text-sm outline-none transition focus:border-hano-green-500 focus:ring-2 focus:ring-hano-primary-200"
-          />
-          {!validation.valid ? (
-            <p className="text-sm text-hano-danger-500">{validation.error}</p>
-          ) : null}
-        </FloatingPanelBody>
-        <FloatingPanelFooter>
+      <div className={panelStyles.panelLayout}>
+        <FloatingPanelHeader className={panelStyles.panelHeaderFixed}>
+          Pickup time
+        </FloatingPanelHeader>
+        <div className={panelStyles.panelBodyScroll}>
+          <FloatingPanelBody className="space-y-3">
+            <p className="text-sm text-hano-muted">
+              Choose when you want to pick up. Must be at least {PREP_TIME_MINUTES} minutes from now
+              and within 24 hours.
+            </p>
+            <input
+              type="datetime-local"
+              value={value}
+              min={minValue}
+              max={maxValue}
+              onChange={(event) => setValue(event.target.value)}
+              className="h-11 w-full rounded-xl border border-hano-border bg-white px-4 text-sm outline-none transition focus:border-hano-green-500 focus:ring-2 focus:ring-hano-primary-200"
+            />
+            {!validation.valid ? (
+              <p className="text-sm text-hano-danger-500">{validation.error}</p>
+            ) : null}
+          </FloatingPanelBody>
+        </div>
+        <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
           <Button
             variant="secondary"
             disabled={!validation.valid}
@@ -566,110 +581,112 @@ function PaymentPanel({
       titleId={titleId}
       header={<FloatingPanelA11yTitle titleId={titleId}>Payment</FloatingPanelA11yTitle>}
     >
-      <div className={panelStyles.panelScroll}>
-        <FloatingPanelHeader>Payment</FloatingPanelHeader>
-        <FloatingPanelBody className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-sm text-hano-muted">Amount due</span>
-            <Price className="text-lg font-bold">{formatRwf(total)}</Price>
-          </div>
-
-          {checkout.orderType === "direct" ? (
-            <p className={styles.infoBanner}>
-              Direct order · estimated prep time: <strong>{PREP_TIME_MINUTES} minutes</strong>
-            </p>
-          ) : (
-            <p className={styles.infoBanner}>
-              Pre-order · pickup at <strong>{pickupLabel}</strong>
-            </p>
-          )}
-
-          <div className={styles.paymentList} role="radiogroup" aria-label="Payment method">
-            {PAYMENT_METHODS.map((paymentMethod) => {
-              const selected = method === paymentMethod.id;
-
-              return (
-                <button
-                  key={paymentMethod.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  onClick={() => setMethod(paymentMethod.id)}
-                  className={`${styles.paymentMethod} ${
-                    selected ? styles.paymentMethodActive : ""
-                  }`}
-                >
-                  <span className={styles.paymentIcon} aria-hidden>
-                    <Image
-                      src={paymentMethod.logo}
-                      alt=""
-                      width={36}
-                      height={36}
-                      className={styles.paymentLogo}
-                    />
-                  </span>
-                  <span className={styles.paymentMethodLabel}>{paymentMethod.name}</span>
-                  <span
-                    className={`${styles.paymentRadio} ${
-                      selected ? styles.paymentRadioActive : ""
-                    }`}
-                    aria-hidden
-                  >
-                    <span className={styles.paymentRadioDot} />
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {(method === "momo" || method === "airtel") && (
-            <Input
-              placeholder="Phone number (7XXXXXXXX)"
-              value={phone}
-              onChange={(event) => setPhone(formatRwandaPhone(event.target.value))}
-              inputMode="numeric"
-              autoComplete="tel"
-              maxLength={10}
-              pattern="0?7[0-9]{8}"
-            />
-          )}
-
-          {method === "card" && (
-            <div className="space-y-3">
-              <Input
-                placeholder="Card number"
-                value={cardNumber}
-                onChange={(event) => setCardNumber(formatCardNumber(event.target.value))}
-                inputMode="numeric"
-                autoComplete="cc-number"
-                maxLength={19}
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <Input
-                  placeholder="MM/YY"
-                  value={cardExpiry}
-                  onChange={(event) => setCardExpiry(formatCardExpiry(event.target.value))}
-                  inputMode="numeric"
-                  autoComplete="cc-exp"
-                  maxLength={5}
-                />
-                <Input
-                  placeholder="CVV"
-                  value={cardCvv}
-                  onChange={(event) => setCardCvv(formatCardCvv(event.target.value))}
-                  inputMode="numeric"
-                  autoComplete="cc-csc"
-                  maxLength={4}
-                />
-              </div>
+      <div className={panelStyles.panelLayout}>
+        <FloatingPanelHeader className={panelStyles.panelHeaderFixed}>Payment</FloatingPanelHeader>
+        <div className={panelStyles.panelBodyScroll}>
+          <FloatingPanelBody className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm text-hano-muted">Amount due</span>
+              <Price className="text-lg font-bold">{formatRwf(total)}</Price>
             </div>
-          )}
 
-          <p className="text-center text-xs text-hano-muted">
-            Payment processing is UI-only until backend integration.
-          </p>
-        </FloatingPanelBody>
-        <FloatingPanelFooter>
+            {checkout.orderType === "direct" ? (
+              <p className={styles.infoBanner}>
+                Direct order · estimated prep time: <strong>{PREP_TIME_MINUTES} minutes</strong>
+              </p>
+            ) : (
+              <p className={styles.infoBanner}>
+                Pre-order · pickup at <strong>{pickupLabel}</strong>
+              </p>
+            )}
+
+            <div className={styles.paymentList} role="radiogroup" aria-label="Payment method">
+              {PAYMENT_METHODS.map((paymentMethod) => {
+                const selected = method === paymentMethod.id;
+
+                return (
+                  <button
+                    key={paymentMethod.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => setMethod(paymentMethod.id)}
+                    className={`${styles.paymentMethod} ${
+                      selected ? styles.paymentMethodActive : ""
+                    }`}
+                  >
+                    <span className={styles.paymentIcon} aria-hidden>
+                      <Image
+                        src={paymentMethod.logo}
+                        alt=""
+                        width={36}
+                        height={36}
+                        className={styles.paymentLogo}
+                      />
+                    </span>
+                    <span className={styles.paymentMethodLabel}>{paymentMethod.name}</span>
+                    <span
+                      className={`${styles.paymentRadio} ${
+                        selected ? styles.paymentRadioActive : ""
+                      }`}
+                      aria-hidden
+                    >
+                      <span className={styles.paymentRadioDot} />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {(method === "momo" || method === "airtel") && (
+              <Input
+                placeholder="Phone number (7XXXXXXXX)"
+                value={phone}
+                onChange={(event) => setPhone(formatRwandaPhone(event.target.value))}
+                inputMode="numeric"
+                autoComplete="tel"
+                maxLength={10}
+                pattern="0?7[0-9]{8}"
+              />
+            )}
+
+            {method === "card" && (
+              <div className="space-y-3">
+                <Input
+                  placeholder="Card number"
+                  value={cardNumber}
+                  onChange={(event) => setCardNumber(formatCardNumber(event.target.value))}
+                  inputMode="numeric"
+                  autoComplete="cc-number"
+                  maxLength={19}
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <Input
+                    placeholder="MM/YY"
+                    value={cardExpiry}
+                    onChange={(event) => setCardExpiry(formatCardExpiry(event.target.value))}
+                    inputMode="numeric"
+                    autoComplete="cc-exp"
+                    maxLength={5}
+                  />
+                  <Input
+                    placeholder="CVV"
+                    value={cardCvv}
+                    onChange={(event) => setCardCvv(formatCardCvv(event.target.value))}
+                    inputMode="numeric"
+                    autoComplete="cc-csc"
+                    maxLength={4}
+                  />
+                </div>
+              </div>
+            )}
+
+            <p className="text-center text-xs text-hano-muted">
+              Payment processing is UI-only until backend integration.
+            </p>
+          </FloatingPanelBody>
+        </div>
+        <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
           <Button variant="secondary" disabled={!canPay} onClick={handlePay}>
             Pay {formatRwf(total)}
           </Button>
@@ -705,35 +722,37 @@ function CheckoutSuccessPanel({
       titleId={titleId}
       header={<FloatingPanelA11yTitle titleId={titleId}>Order placed</FloatingPanelA11yTitle>}
     >
-      <div className={panelStyles.panelScroll}>
-        <FloatingPanelBody className="py-4">
-          <div className={styles.successIcon}>✓</div>
-          <p className={styles.successTitle}>Order placed!</p>
-          <p className={styles.successText}>Your order has been submitted successfully.</p>
-          <div className={styles.successSummary}>
-            <div className={styles.successRow}>
-              <span className={styles.successRowLabel}>Amount paid</span>
-              <Price className="font-semibold">{formatRwf(summary.amountPaid)}</Price>
-            </div>
-            <div className={styles.successRow}>
-              <span className={styles.successRowLabel}>Payment</span>
-              <span>{paymentLabel}</span>
-            </div>
-            {summary.orderType === "direct" && summary.readyBy ? (
+      <div className={panelStyles.panelLayout}>
+        <div className={panelStyles.panelBodyScroll}>
+          <FloatingPanelBody className="py-4">
+            <div className={styles.successIcon}>✓</div>
+            <p className={styles.successTitle}>Order placed!</p>
+            <p className={styles.successText}>Your order has been submitted successfully.</p>
+            <div className={styles.successSummary}>
               <div className={styles.successRow}>
-                <span className={styles.successRowLabel}>Ready by</span>
-                <span>{formatOrderDateTime(summary.readyBy)}</span>
+                <span className={styles.successRowLabel}>Amount paid</span>
+                <Price className="font-semibold">{formatRwf(summary.amountPaid)}</Price>
               </div>
-            ) : null}
-            {summary.orderType === "pre-order" && summary.pickupTime ? (
               <div className={styles.successRow}>
-                <span className={styles.successRowLabel}>Pickup</span>
-                <span>{formatOrderDateTime(summary.pickupTime)}</span>
+                <span className={styles.successRowLabel}>Payment</span>
+                <span>{paymentLabel}</span>
               </div>
-            ) : null}
-          </div>
-        </FloatingPanelBody>
-        <FloatingPanelFooter>
+              {summary.orderType === "direct" && summary.readyBy ? (
+                <div className={styles.successRow}>
+                  <span className={styles.successRowLabel}>Ready by</span>
+                  <span>{formatOrderDateTime(summary.readyBy)}</span>
+                </div>
+              ) : null}
+              {summary.orderType === "pre-order" && summary.pickupTime ? (
+                <div className={styles.successRow}>
+                  <span className={styles.successRowLabel}>Pickup</span>
+                  <span>{formatOrderDateTime(summary.pickupTime)}</span>
+                </div>
+              ) : null}
+            </div>
+          </FloatingPanelBody>
+        </div>
+        <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
           <Button
             variant="outline"
             onClick={() => {
@@ -782,12 +801,16 @@ function OrderDetailPanel({
         titleId={titleId}
         header={<FloatingPanelA11yTitle titleId={titleId}>Order details</FloatingPanelA11yTitle>}
       >
-        <div className={panelStyles.panelScroll}>
-          <FloatingPanelHeader>Order details</FloatingPanelHeader>
-          <FloatingPanelBody>
-            <p className={styles.empty}>Order not found.</p>
-          </FloatingPanelBody>
-          <FloatingPanelFooter>
+        <div className={panelStyles.panelLayout}>
+          <FloatingPanelHeader className={panelStyles.panelHeaderFixed}>
+            Order details
+          </FloatingPanelHeader>
+          <div className={panelStyles.panelBodyScroll}>
+            <FloatingPanelBody>
+              <p className={styles.empty}>Order not found.</p>
+            </FloatingPanelBody>
+          </div>
+          <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
             <Button
               variant="outline"
               onClick={() => {
@@ -808,12 +831,16 @@ function OrderDetailPanel({
       titleId={titleId}
       header={<FloatingPanelA11yTitle titleId={titleId}>Order details</FloatingPanelA11yTitle>}
     >
-      <div className={panelStyles.panelScroll}>
-        <FloatingPanelHeader>Order details</FloatingPanelHeader>
-        <FloatingPanelBody>
-          <OrderDetailContent order={order} />
-        </FloatingPanelBody>
-        <FloatingPanelFooter>
+      <div className={panelStyles.panelLayout}>
+        <FloatingPanelHeader className={panelStyles.panelHeaderFixed}>
+          Order details
+        </FloatingPanelHeader>
+        <div className={panelStyles.panelBodyScroll}>
+          <FloatingPanelBody>
+            <OrderDetailContent order={order} />
+          </FloatingPanelBody>
+        </div>
+        <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
           <Button
             variant="outline"
             onClick={() => {

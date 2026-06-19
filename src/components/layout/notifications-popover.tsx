@@ -25,6 +25,7 @@ import {
   FloatingPanelRoot,
   useFloatingPanel,
 } from "@/components/ui/floating-panel";
+import panelStyles from "@/components/ui/floating-panel.module.css";
 import styles from "./notifications-popover.module.css";
 
 type NotificationsPopoverContextValue = {
@@ -57,12 +58,12 @@ function NotificationsPanel() {
       titleId={titleId}
       header={<FloatingPanelA11yTitle titleId={titleId}>Notifications & updates</FloatingPanelA11yTitle>}
     >
-      <div className={styles.panelLayout}>
-        <FloatingPanelHeader className={styles.panelHeader}>
+      <div className={panelStyles.panelLayout}>
+        <FloatingPanelHeader className={panelStyles.panelHeaderFixed}>
           Notifications & updates
         </FloatingPanelHeader>
 
-        <div className={styles.panelBodyScroll}>
+        <div className={panelStyles.panelBodyScroll}>
           <FloatingPanelBody className={styles.panelBody}>
             <section>
               <p className={styles.sectionTitle}>Notifications</p>
@@ -108,7 +109,7 @@ function NotificationsPanel() {
           </FloatingPanelBody>
         </div>
 
-        <FloatingPanelFooter className={styles.panelFooter}>
+        <FloatingPanelFooter className={panelStyles.panelFooterFixed}>
           <Link href="/places" className={styles.footerLink} onClick={closeFloatingPanel}>
             View all promos
           </Link>

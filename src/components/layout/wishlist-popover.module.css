@@ -95,12 +95,6 @@
   background: var(--hano-primary-50);
 }
 
-.iconButtonPinned {
-  color: var(--hano-green-500);
-  background: var(--hano-primary-100);
-  border-color: var(--hano-primary-400);
-}
-
 .footerLink {
   font-size: var(--text-sm);
   font-weight: var(--font-weight-medium);
