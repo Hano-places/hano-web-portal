@@ -1,5 +1,10 @@
 import { apiRequest, buildQuery } from "./client";
-import type { PlaceDetail, PlacesQuery, PlacesResponse } from "./types";
+import type {
+  ConsumerMenuResponse,
+  PlaceDetail,
+  PlacesQuery,
+  PlacesResponse,
+} from "./types";
 
 export const placesApi = {
   getPlaces: (query: PlacesQuery = {}) =>
@@ -8,4 +13,7 @@ export const placesApi = {
     ),
 
   getPlace: (id: string) => apiRequest<PlaceDetail>(`/v1/places/places/${id}`),
+
+  getMenu: (placeId: string) =>
+    apiRequest<ConsumerMenuResponse>(`/v1/places/places/${placeId}/menu`),
 };

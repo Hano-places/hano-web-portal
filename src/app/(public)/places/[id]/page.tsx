@@ -17,6 +17,7 @@ import { Price } from "@/components/ui/price";
 import { TruncateTooltip } from "@/components/ui/truncate-tooltip";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useAddToCartWithConflict } from "@/hooks/use-add-to-cart";
+import { usePlaceMenu } from "@/hooks/use-place-menu";
 import {
   PlaceReviewProvider,
   RateReviewButton,
@@ -44,6 +45,7 @@ export default function PlaceDetailPage() {
   const { requestAdd, conflictDialog } = useAddToCartWithConflict();
   const [menuCategory, setMenuCategory] = useState("All");
   const businessOverrides = useBusinessPlaceOverrides(id);
+  const apiMenu = usePlaceMenu(id);
   const seedPlace = getPlaceById(id);
   const place = seedPlace ?? businessOverrides?.placeSeed;
 
@@ -52,10 +54,11 @@ export default function PlaceDetailPage() {
   }
 
   const weeklyHours = businessOverrides?.weeklyHours ?? place.hours;
+  // Prefer business-configured menu, then the live API menu, then the mock menu.
   const catalogMenu =
     businessOverrides && businessOverrides.menuItems.length > 0
       ? businessOverrides.menuItems
-      : PLACE_MENU_ITEMS;
+      : apiMenu.items;
 
   const { isOpen, todayHours } = getOpenStatus(weeklyHours);
   const reviews = place.reviews ?? [];
@@ -177,6 +180,7 @@ export default function PlaceDetailPage() {
     requestAdd(
       {
         id: `${id}-${item.id}`,
+        menuItemId: item.id,
         name: item.name,
         price: item.price,
         priceRaw: item.priceRaw,
@@ -195,6 +199,7 @@ export default function PlaceDetailPage() {
     requestAdd(
       {
         id: `${id}-${item.id}`,
+        menuItemId: item.id,
         name: item.name,
         price,
         priceRaw,

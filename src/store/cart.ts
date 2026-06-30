@@ -7,9 +7,12 @@ import {
   isPreviousOrderStatus,
   PREP_TIME_MINUTES,
 } from "@/lib/order-rules";
+import { syncOrderToApi } from "@/lib/commerce/sync-order";
 
 export interface CartItem {
   id: string;
+  /** Server menu item id (when added from the live API menu); enables order sync. */
+  menuItemId?: string;
   name: string;
   price: string;
   priceRaw: number;
@@ -219,6 +222,18 @@ export const useCartStore = create<CartState>()(
         };
 
         set({ orders: [order, ...orders] });
+
+        // Best-effort sync to the API (no-op for mock items or when unauthenticated).
+        void syncOrderToApi({
+          placeId: currentPlaceId,
+          items: items.map((item) => ({
+            menuItemId: item.menuItemId,
+            qty: item.qty,
+          })),
+          orderType: type,
+          pickupTime: type === "pre-order" ? pickupTime : undefined,
+        });
+
         get().clearCart();
       },
 

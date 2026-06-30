@@ -4,10 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getPlaceById } from "@/lib/places-data";
-import { PLACE_MENU_ITEMS } from "@/lib/data/mock-data";
 import { AddToCartButton } from "@/components/places/add-to-cart-button";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useAddToCartWithConflict } from "@/hooks/use-add-to-cart";
+import { usePlaceMenu } from "@/hooks/use-place-menu";
 import { useOrderPopover } from "@/components/layout/order-popover";
 import { Icon } from "@/components/ui/icon";
 
@@ -19,11 +19,16 @@ export default function ItemDetailPage() {
   const { requestAdd, conflictDialog } = useAddToCartWithConflict();
   const { openOrderPopover } = useOrderPopover();
   const place = getPlaceById(placeId);
+  const menu = usePlaceMenu(placeId);
 
-  const item = PLACE_MENU_ITEMS.find((i) => i.id === itemId);
+  const item = menu.items.find((i) => i.id === itemId);
 
   if (!item) {
-    return <div className="py-12 text-center">Item not found</div>;
+    return (
+      <div className="py-12 text-center">
+        {menu.loading ? "Loading…" : "Item not found"}
+      </div>
+    );
   }
 
   const handleOrder = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -31,6 +36,7 @@ export default function ItemDetailPage() {
     const added = requestAdd(
       {
         id: `${placeId}-${item.id}`,
+        menuItemId: item.id,
         name: item.name,
         price: item.price,
         priceRaw: item.priceRaw,

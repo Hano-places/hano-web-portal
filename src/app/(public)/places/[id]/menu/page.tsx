@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { getPlaceById } from "@/lib/places-data";
-import { PLACE_MENU_ITEMS } from "@/lib/data/mock-data";
+import type { MenuItem } from "@/lib/data/mock-data";
 import { CartItemAction, InCartBadge, useCartItemQty } from "@/components/places/cart-item-action";
 import { FilterChip } from "@/components/ui/filter-chip";
 import { Icon } from "@/components/ui/icon";
 import { Price } from "@/components/ui/price";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useAddToCartWithConflict } from "@/hooks/use-add-to-cart";
+import { usePlaceMenu } from "@/hooks/use-place-menu";
 import { OrderTriggerButton } from "@/components/layout/order-popover";
 import { WishlistDishButton } from "@/components/wishlist/wishlist-save-button";
 import { useCartStore } from "@/store/cart";
@@ -28,26 +29,27 @@ export default function PlaceMenuPage() {
   const { requestAdd, conflictDialog } = useAddToCartWithConflict();
   const itemCount = useCartStore((s) => s.getItemCount());
   const place = getPlaceById(id);
+  const menu = usePlaceMenu(id).items;
 
-  const getCategoryRank = (item: (typeof PLACE_MENU_ITEMS)[0]) =>
-    PLACE_MENU_ITEMS.filter((i) => i.category === item.category)
+  const getCategoryRank = (item: MenuItem) =>
+    menu
+      .filter((i) => i.category === item.category)
       .sort((a, b) => {
         if (b.rating !== a.rating) return b.rating - a.rating;
         return b.orders - a.orders;
       })
       .findIndex((i) => i.id === item.id) + 1;
 
-  const categories = ["All", ...new Set(PLACE_MENU_ITEMS.map((i) => i.category))];
+  const categories = ["All", ...new Set(menu.map((i) => i.category))];
   const items =
-    category === "All"
-      ? PLACE_MENU_ITEMS
-      : PLACE_MENU_ITEMS.filter((i) => i.category === category);
+    category === "All" ? menu : menu.filter((i) => i.category === category);
 
-  const handleAdd = (item: (typeof PLACE_MENU_ITEMS)[0]) => {
+  const handleAdd = (item: MenuItem) => {
     if (!requireAuth("add_to_cart") || !place) return;
     requestAdd(
       {
         id: `${id}-${item.id}`,
+        menuItemId: item.id,
         name: item.name,
         price: item.price,
         priceRaw: item.priceRaw,
@@ -113,9 +115,9 @@ function MenuItemsList({
 }: {
   placeId: string;
   placeName: string;
-  items: typeof PLACE_MENU_ITEMS;
-  onAdd: (item: (typeof PLACE_MENU_ITEMS)[0]) => void;
-  getCategoryRank: (item: (typeof PLACE_MENU_ITEMS)[0]) => number;
+  items: MenuItem[];
+  onAdd: (item: MenuItem) => void;
+  getCategoryRank: (item: MenuItem) => number;
 }) {
   const { openMenuItem } = useMenuItemPopover();
 
@@ -146,9 +148,9 @@ function MenuItemCard({
 }: {
   placeId: string;
   placeName: string;
-  item: (typeof PLACE_MENU_ITEMS)[0];
-  onAdd: (item: (typeof PLACE_MENU_ITEMS)[0]) => void;
-  getCategoryRank: (item: (typeof PLACE_MENU_ITEMS)[0]) => number;
+  item: MenuItem;
+  onAdd: (item: MenuItem) => void;
+  getCategoryRank: (item: MenuItem) => number;
   onOpen: ReturnType<typeof useMenuItemPopover>["openMenuItem"];
 }) {
   const cartItemId = `${placeId}-${item.id}`;
